@@ -6,12 +6,11 @@ listing:
       - "/projects/*.qmd"
     sort: false
     sort-ui: false
-    filter-ui: true
+    filter-ui: false
     type: grid
     fields: 
       - title
       - image
-      - subtitle
     categories: false
 ---
 
