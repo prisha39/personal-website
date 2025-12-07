@@ -1,0 +1,10 @@
+---
+title: Project 2
+---
+
+some complicated stats project
+
+```{r}
+rnorm(100) |> hist()
+```
+

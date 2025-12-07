@@ -4,18 +4,25 @@ project:
 website:
   title: "personal website"
   navbar:
-    left:
+    right:
       - href: index.qmd
         text: Home
-      - href: about.qmd
+      - href: projects.qmd
+        text: Projects
+  page-footer:
+    right: "&copy; 2025, Prisha Narasimhan"
 
 format:
   html:
-    theme:
-      - cosmo
-      - brand
+    theme: cosmo
     css: styles.css
     toc: true
+    
+execute: 
+  freeze: auto
+  
+  
+
 
 
 
