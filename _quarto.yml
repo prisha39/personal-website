@@ -5,6 +5,7 @@ project:
 
 website:
   title: "personal website"
+  search: false
   navbar:
     right:
       - href: index.qmd
