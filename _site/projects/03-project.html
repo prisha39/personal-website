@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Prisha Narasimhan">
+<meta name="dcterms.date" content="2025-10-15">
+<meta name="description" content="  This project analyzes residential natural gas consumption across five U.S. states (NY, FL, MI, TX, CA) from 1967–1989 using panel data techniques. I explored how energy prices, heating degree days, and per-capita income affect consumption, comparing pooled, fixed-effects, and random-effects models. Diagnostics, heterogeneity tests, and model selection procedures were applied to identify the preferred two-way fixed effects model, providing insights into the influence of climate, prices, and income on gas consumption.">
+
+<title>Economics 104 - Natural Gas Panel Dataset – personal website</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">personal website</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#a.-data-discussion" id="toc-a.-data-discussion" class="nav-link active" data-scroll-target="#a.-data-discussion">a. Data Discussion</a></li>
+  <li><a href="#b.-variable-description" id="toc-b.-variable-description" class="nav-link" data-scroll-target="#b.-variable-description">b. Variable Description</a></li>
+  <li><a href="#c.-model-fitting" id="toc-c.-model-fitting" class="nav-link" data-scroll-target="#c.-model-fitting">c.&nbsp;Model Fitting</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Economics 104 - Natural Gas Panel Dataset</h1>
+</div>
+
+<div>
+  <div class="description">
+    <p><br> This project analyzes residential natural gas consumption across five U.S. states (NY, FL, MI, TX, CA) from 1967–1989 using panel data techniques. I explored how energy prices, heating degree days, and per-capita income affect consumption, comparing pooled, fixed-effects, and random-effects models. Diagnostics, heterogeneity tests, and model selection procedures were applied to identify the preferred two-way fixed effects model, providing insights into the influence of climate, prices, and income on gas consumption.</p>
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Prisha Narasimhan </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 15, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"NaturalGas"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>natural_gas <span class="ot">&lt;-</span> <span class="fu">subset</span>(NaturalGas, state <span class="sc">==</span> <span class="st">"NY"</span> <span class="sc">|</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                        state <span class="sc">==</span> <span class="st">"FL"</span> <span class="sc">|</span> state <span class="sc">==</span> <span class="st">"MI"</span> <span class="sc">|</span> state <span class="sc">==</span> <span class="st">"TX"</span> <span class="sc">|</span> state <span class="sc">==</span> <span class="st">"CA"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>natural_gas_pd <span class="ot">&lt;-</span> <span class="fu">pdata.frame</span>(natural_gas, <span class="at">index =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"year"</span>))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(natural_gas_pd) <span class="co"># make sure it's a panel data</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "pdata.frame" "data.frame" </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(natural_gas_pd) <span class="co"># dimension</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 115  10</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is.pbalanced</span>(natural_gas_pd) <span class="co"># is it balanced</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<section id="a.-data-discussion" class="level1">
+<h1>a. Data Discussion</h1>
+<p>Briefly discuss the question you are trying to answer.</p>
+<p>For this panel data projet, we’re using the Natural Gas dataset from the AERpackage in R, which contains 115 observations from 5 US states over the period 1967-1989. The source of the data is from Baltagi (2002). The dataset includes variables such as consumption (consumption of natural gas by the residential sector), price (the price of natural gas), eprice, (price of electricity), oprice (price of distillate fuel oil), lprice (price of liquefied petroleum gas), heating (heating degree days), and income (real per-capita personal income). Specifically, the question we are trying to answer is: How do prices (of natural gas, electricity, distillate fuel oil, and liquefied petroleum gas),heating degree days, and personal income affect consumption of natural gas? The dimensions of the panel dataset is 115 rows and 10 columns and is therefore long and narrow. The panel dataset is balanced.</p>
+<p>The citation of the dataset is: Baltagi, B.H. (2002). Econometrics, 3rd ed.&nbsp;Berlin, Springer.</p>
+</section>
+<section id="b.-variable-description" class="level1">
+<h1>b. Variable Description</h1>
+<p>Provide a descriptive analysis of your variables. This should include relevant figures with comments including some graphical depiction of individual hetero-geneity; no unnecessary figures!</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># histograms for each variable</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(natural_gas_pd<span class="sc">$</span>consumption, <span class="at">main =</span> <span class="st">"Histogram of Consumption"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(natural_gas_pd<span class="sc">$</span>price, <span class="at">main =</span> <span class="st">"Histogram of Price"</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(natural_gas_pd<span class="sc">$</span>eprice, <span class="at">main =</span> <span class="st">"Histogram of ePrice"</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(natural_gas_pd<span class="sc">$</span>oprice, <span class="at">main =</span> <span class="st">"Histogram of oPrice"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(natural_gas_pd<span class="sc">$</span>lprice, <span class="at">main =</span> <span class="st">"Histogram of lPrice"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(natural_gas_pd<span class="sc">$</span>heating, <span class="at">main =</span> <span class="st">"Histogram of Heating"</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(natural_gas_pd<span class="sc">$</span>income, <span class="at">main =</span> <span class="st">"Histogram of Income"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>I ran histograms for each feature and the response in the case of an extreme right skew. In which case, we would implement the log of the variable to better adhere to the linear regression assumptions. From the plots we see that while there are some moderate right skews, none of which are rather extreme, and therefore, we will not need to log transform the respective variables.</p>
+<p>Consumption: Residential gas consumption is somewhat normal and however, has a second peak towards the left tail. The two peaks are between 0 and 50,000 and 300,000 and 350,000, suggesting that these are perhaps the more common ranges for annual residential gas consumption across states. The range of the data is between 0 to 65,000 with limited to no outliers observed.</p>
+<p>Price: The price of natural gas is slightly right-skewed, indicating that while the price of natural gas has been relatively low across most state-years, there have been a few instances of higher prices. The peak occurs around 1 to 2, suggesting that this is the common range of prices for natural gas across states. The range of prices is from 0 to 9 with limited to no outliers observed.</p>
+<p>ePrice: The price of electricity is slightly right-skewed, indicating that while the price of electricity has been relatively lower across most state-years, there have been a few instances of higher electricity prices. The peak occurs around 2 to 3, suggesting that this is the common range of prices for electricity across states. The range of prices for electricity is from 1 to 11 with limited to no outliers observed.</p>
+<p>oPrice: The price of distillate fuel oil is very slightly right-skewed, indicating that while the price of distillate fuel oil has been somewhat relatively lower across most state-years, there have been fewer years of higher distillate fuel oil prices as well. The peak occurs around 5 to 10, suggesting that this is the most common range of prices for distillate fuel oil. The range of prices is from 5 to 55 with limited to no outliers observed.</p>
+<p>lPrice: The price of liquefied petroleum gas has a very slight right-skew, indicating that while the price of liquefied petroleum gas has been somewhat relatively lower across most state-years, there have been fewer years of higher liquefied petroleum gas as well. The peak occurs around 1 to 2, suggesting that this is the common range of prices for liquefied petroleum gas. The range of prices is from 0 to 8 with limited to no outliers observed.</p>
+<p>Heating: Heating degree days looks to have a bi-modal distribution with two peaks from 2000 to 3000, and 6000 to 7000, suggesting that these are perhaps the more common ranges for heating degree days across states. The range of data is between 0 to 8000 with limited to no outliers observed.</p>
+<p>Income: Income across all states and years is approximately normally distributed, indicating that most state-year observations cluster around a central average, with fewer very low or very high values. There is no strong skew, and extreme outliers seem limited.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scatterplot</span>(consumption <span class="sc">~</span> state <span class="sc">|</span> year, <span class="at">data =</span> natural_gas_pd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "24"  "35"  "57"  "60"  "104" "105"</code></pre>
+</div>
+</div>
+<p>From the scatterplot of consumption across states, we see a varying range of the data, with California having the largest range and Florida seemingly have the shortest. Additionally, the means with respect to the level of consumption indicates rather varying level of consumption per state. Therefore, both the average level of consumption and the range of consumption seem different across states, suggesting individual heterogeneity.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scatterplot</span>(price <span class="sc">~</span> state <span class="sc">|</span> year, <span class="at">data =</span> natural_gas_pd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the scatterplot of the price of natural gas across states, we see a similar price range of the data, and somewhat similar average price levels as well. Based on the similar price levels and ranges across states, this scatterplot therefore does not suggest individual heterogeneity, though further testing is necessary.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scatterplot</span>(eprice <span class="sc">~</span> state <span class="sc">|</span> year, <span class="at">data =</span> natural_gas_pd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the scatterplot of the price of electricity across states, we see a slightly varying price range of the data, and however, somewhat similar average price levels. Based on the similar price levels and slightly varying ranges across states, this scatterplot does not suggest individual heterogeneity, though further testing is necessary.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scatterplot</span>(oprice <span class="sc">~</span> state <span class="sc">|</span> year, <span class="at">data =</span> natural_gas_pd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the scatterplot of the price of distillate fuel oil across states, we see a similar price range of the data, and similar average price levels. Based on the similar price levels and ranges across states, this scatterplot does notsuggest individual heterogeneity.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scatterplot</span>(lprice <span class="sc">~</span> state <span class="sc">|</span> year, <span class="at">data =</span> natural_gas_pd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the scatterplot of the price of liquefied petroleum gas, we see a similar price range of the data, and somewhat varying average price levels. Based on the similar price levels and slightly varying ranges across states, this scatterplot therefore does not suggest individual heterogeneity, however further testing is necessay.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scatterplot</span>(heating <span class="sc">~</span> state <span class="sc">|</span> year, <span class="at">data =</span> natural_gas_pd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "53" "67"</code></pre>
+</div>
+</div>
+<p>From the scatterplot of heating degree days, we see a similar range of the data across states. Additionally, the means with respect to the level of heating indicates an extremely varying level of heating degree days per state. Therefore, while the range of the level of heating is rather similar across states, the average level greatly varies, suggesting indivdual heterogeneity, though further testing is necessary.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">scatterplot</span>(income <span class="sc">~</span> state <span class="sc">|</span> year, <span class="at">data =</span> natural_gas_pd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "91" "92"</code></pre>
+</div>
+</div>
+<p>From the scatterplot of per-capita personal income, we see varying ranges of the data across states. Additionally, the means with respect to the level of income indicates an moderate level of variation of income per state. Therefore, while the range and price of the level of income moderately vary, individual heterogeneity is suggested, though further testing is necessary.</p>
+<p>Based on the analysis of the observable variables, it is suggested that individual heterogeneity may be present in the model, alluding to the fact the differences may be attributed to factors or variables that are unobserved or unaccounted for.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotmeans</span>(consumption <span class="sc">~</span> state, <span class="at">data =</span> natural_gas_pd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in arrows(x, li, x, pmax(y - gap, li), col = barcol, lwd = lwd, :
+zero-length arrow is of indeterminate angle and so skipped
+Warning in arrows(x, li, x, pmax(y - gap, li), col = barcol, lwd = lwd, :
+zero-length arrow is of indeterminate angle and so skipped
+Warning in arrows(x, li, x, pmax(y - gap, li), col = barcol, lwd = lwd, :
+zero-length arrow is of indeterminate angle and so skipped
+Warning in arrows(x, li, x, pmax(y - gap, li), col = barcol, lwd = lwd, :
+zero-length arrow is of indeterminate angle and so skipped
+Warning in arrows(x, li, x, pmax(y - gap, li), col = barcol, lwd = lwd, :
+zero-length arrow is of indeterminate angle and so skipped</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in arrows(x, ui, x, pmin(y + gap, ui), col = barcol, lwd = lwd, :
+zero-length arrow is of indeterminate angle and so skipped
+Warning in arrows(x, ui, x, pmin(y + gap, ui), col = barcol, lwd = lwd, :
+zero-length arrow is of indeterminate angle and so skipped
+Warning in arrows(x, ui, x, pmin(y + gap, ui), col = barcol, lwd = lwd, :
+zero-length arrow is of indeterminate angle and so skipped
+Warning in arrows(x, ui, x, pmin(y + gap, ui), col = barcol, lwd = lwd, :
+zero-length arrow is of indeterminate angle and so skipped
+Warning in arrows(x, ui, x, pmin(y + gap, ui), col = barcol, lwd = lwd, :
+zero-length arrow is of indeterminate angle and so skipped</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The above plot indicates that across each unit (states), there are differences in the average level of consumption of natural gas.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotmeans</span>(consumption <span class="sc">~</span> year, <span class="at">data =</span> natural_gas_pd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03-project_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" data-fig-pos="!H" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The above plot suggests that overtime, the average level of consumption doesn’t seem to fluctuate much. Additionally, the range also seems to be of a constant size over time. From the plot, statistical insignificance of the differnce maybe be suggested but further testing is necessary to make such a conclusion. Overall, while there may be consistency across the years, there seems to be significant individual differences across states.</p>
+</section>
+<section id="c.-model-fitting" class="level1">
+<h1>c.&nbsp;Model Fitting</h1>
+<p>c.Fit the three models below, and identify which model is your preferred one and why. Make sure to include your statistical diagnostics to support your conclusion, and to comment on your findings.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>pooledreg1 <span class="ot">&lt;-</span> <span class="fu">plm</span>(consumption<span class="sc">~</span>price<span class="sc">+</span>eprice<span class="sc">+</span>oprice<span class="sc">+</span>lprice<span class="sc">+</span>heating<span class="sc">+</span>income,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">model=</span><span class="st">"pooling"</span>,<span class="at">data=</span>natural_gas_pd)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Cluster robust standard errors</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>crse<span class="ot">&lt;-</span> <span class="fu">coeftest</span>(pooledreg1, <span class="at">vcov=</span><span class="fu">vcovHC</span>(pooledreg1,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="at">type=</span><span class="st">"HC0"</span>,<span class="at">cluster=</span><span class="st">"group"</span>))</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">stargazer</span>(pooledreg1, crse, <span class="at">column.labels =</span> <span class="fu">c</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">textit{Pooled}"</span>, </span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"</span><span class="sc">\\</span><span class="st">textit{Pooled(prse)}"</span>),</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">model.names =</span> <span class="cn">FALSE</span>,<span class="at">type =</span> <span class="st">"text"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+====================================================
+                       Dependent variable:          
+             ---------------------------------------
+                   consumption                      
+                     Pooled           Pooled(prse)  
+                       (1)                 (2)      
+----------------------------------------------------
+price            -104,163.000***     -104,163.000***
+                  (34,055.000)        (21,477.000)  
+                                                    
+eprice             27,709.000*         27,709.000   
+                  (15,928.000)        (28,194.000)  
+                                                    
+oprice             3,868.000**         3,868.000**  
+                   (1,550.000)         (1,841.000)  
+                                                    
+lprice             -15,593.000         -15,593.000  
+                  (29,488.000)        (16,149.000)  
+                                                    
+heating               5.112               5.112     
+                     (4.627)             (7.634)    
+                                                    
+income              85.770***           85.770***   
+                     (9.856)            (27.520)    
+                                                    
+Constant         -538,137.000***     -538,137.000** 
+                  (89,926.000)        (207,779.000) 
+                                                    
+----------------------------------------------------
+Observations           115                          
+R2                    0.727                         
+Adjusted R2           0.711                         
+F Statistic  47.830*** (df = 6; 108)                
+====================================================
+Note:                    *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</code></pre>
+</div>
+</div>
+<p>The coefficients from the pooled model may be interpretted as such: A one-unit increase in the price of natural gas is associated with a 104,163 unit decrease in natural gas consumption, on average, across all states and years. A one-unit increase in the price of electricity is associated with a 27,709 unit increase in electricity consumption, on average, across all states and years. A one-unit increase in the price of distillate fuel oil is associated with a 3,868 unit increase in distillate fuel oil consumption, on average, across all states and years. A one-unit increase in the price of liquefied petroleum gas is associated with a 15,593 unit decrease in distillate fuel oil consumption, on average, across all states and years. A one-unit increase in the heating degree days is associated with a 5.112 unit increase in consumption, on average, across all states and years. A one-unit increase in the per-capita personal income is associated with a 85.77 unit increase in consumption, on average, across all states and years.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixed effect model: one way (individual)</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>withinreg1 <span class="ot">&lt;-</span> <span class="fu">plm</span>(consumption<span class="sc">~</span>price<span class="sc">+</span>eprice<span class="sc">+</span>oprice<span class="sc">+</span>lprice<span class="sc">+</span>heating<span class="sc">+</span>income, <span class="at">model=</span><span class="st">"within"</span>, <span class="at">effect =</span> <span class="st">"individual"</span>, <span class="at">data=</span>natural_gas_pd)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(withinreg1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Oneway (individual) effect Within Model
+
+Call:
+plm(formula = consumption ~ price + eprice + oprice + lprice + 
+    heating + income, data = natural_gas_pd, effect = "individual", 
+    model = "within")
+
+Balanced Panel: n = 5, T = 23, N = 115
+
+Residuals:
+   Min. 1st Qu.  Median 3rd Qu.    Max. 
+ -66534  -12662     214   11717   80863 
+
+Coefficients:
+        Estimate Std. Error t-value Pr(&gt;|t|)    
+price    8550.60    9935.04    0.86    0.391    
+eprice  -7366.93    5722.26   -1.29    0.201    
+oprice     75.25     490.75    0.15    0.878    
+lprice  -7267.64    8547.89   -0.85    0.397    
+heating    46.93      10.45    4.49 0.000018 ***
+income      6.75       3.96    1.71    0.091 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    8.89e+10
+Residual Sum of Squares: 6.63e+10
+R-Squared:      0.254
+Adj. R-Squared: 0.183
+F-statistic: 5.91678 on 6 and 104 DF, p-value: 0.0000241</code></pre>
+</div>
+</div>
+<p>This model accounts for individual effects. We may conclude that generally (and the term generally may be applied to all other coefficient interpretations for this set of comments) there is 8550.60 increase in the level of consumption when the price of natural gas increases by 1 unit. There is 7366.93 decrease in the level of consumption when the price of electricity increases by one unit. There is a 75.25 increase in the level of consumption when the price of distillate fuel oil increases by one unit. There is a 7267.64 decrease in the level of consumption when the price of liquefied petroleum gas increases by one unit. There is a 46.93 increase in the level of consumption when heating degree days increaes by one unit. And there is a 6.75 increase in the level of consumption when per-capita personal income increases by one unit. This is the result within each state once accounting for the differences between states.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixed effect model: one way (time)</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>withinreg2 <span class="ot">&lt;-</span> <span class="fu">plm</span>(consumption<span class="sc">~</span>price<span class="sc">+</span>eprice<span class="sc">+</span>oprice<span class="sc">+</span>lprice<span class="sc">+</span>heating<span class="sc">+</span>income, <span class="at">model=</span><span class="st">"within"</span>, <span class="at">effect =</span> <span class="st">"time"</span>, <span class="at">data=</span>natural_gas_pd)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(withinreg2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Oneway (time) effect Within Model
+
+Call:
+plm(formula = consumption ~ price + eprice + oprice + lprice + 
+    heating + income, data = natural_gas_pd, effect = "time", 
+    model = "within")
+
+Balanced Panel: n = 5, T = 23, N = 115
+
+Residuals:
+   Min. 1st Qu.  Median 3rd Qu.    Max. 
+-114033  -43894   -1522   50755  163319 
+
+Coefficients:
+         Estimate Std. Error t-value Pr(&gt;|t|)    
+price   -7.24e+04   3.67e+04   -1.97   0.0517 .  
+eprice   3.68e+04   1.37e+04    2.68   0.0088 ** 
+oprice   2.89e+03   3.21e+03    0.90   0.3719    
+lprice  -1.08e+05   3.79e+04   -2.84   0.0056 ** 
+heating  4.02e-01   3.95e+00    0.10   0.9190    
+income   9.00e+01   9.59e+00    9.38  8.1e-15 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    3.5e+12
+Residual Sum of Squares: 4.99e+11
+R-Squared:      0.857
+Adj. R-Squared: 0.811
+F-statistic: 86.0979 on 6 and 86 DF, p-value: &lt;2e-16</code></pre>
+</div>
+</div>
+<p>This model accounts for time effects. We may conclude that generally (and the term generally may be applied to all other coefficient interpretations for this set of comments) there is 7.24e+04 decrease in the level of consumption when the price of natural gas increases by 1 unit. There is 3.68e+04 increase in the level of consumption when the price of electricity increases by one unit. There is a 2.89e+03 increase in the level of consumption when the price of distillate fuel oil increases by one unit. There is a 1.08e+05 decrease in the level of consumption when the price of liquefied petroleum gas increases by one unit. There is a 4.02e-01 increase in the level of consumption when heating degree days increase by one unit. And there is a 9.00e+01 increase in the level of consumption when per-capita personal income increases by one unit. This is the result within each year once accounting for the differences across time.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixed effect model: twoways</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>withinreg3 <span class="ot">&lt;-</span> <span class="fu">plm</span>(consumption<span class="sc">~</span>price<span class="sc">+</span>eprice<span class="sc">+</span>oprice<span class="sc">+</span>lprice<span class="sc">+</span>heating<span class="sc">+</span>income, <span class="at">model=</span><span class="st">"within"</span>, <span class="at">effect =</span> <span class="st">"twoways"</span>, <span class="at">data=</span>natural_gas_pd)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(withinreg3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Twoways effects Within Model
+
+Call:
+plm(formula = consumption ~ price + eprice + oprice + lprice + 
+    heating + income, data = natural_gas_pd, effect = "twoways", 
+    model = "within")
+
+Balanced Panel: n = 5, T = 23, N = 115
+
+Residuals:
+   Min. 1st Qu.  Median 3rd Qu.    Max. 
+ -60442  -11674    -136   12153   56993 
+
+Coefficients:
+        Estimate Std. Error t-value Pr(&gt;|t|)    
+price   12557.58   11579.83    1.08     0.28    
+eprice  -8425.45    5926.83   -1.42     0.16    
+oprice    803.70    1000.90    0.80     0.42    
+lprice  12545.43   12460.36    1.01     0.32    
+heating    60.55      11.03    5.49  4.4e-07 ***
+income     -2.03       5.67   -0.36     0.72    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    6.12e+10
+Residual Sum of Squares: 4.16e+10
+R-Squared:      0.32
+Adj. R-Squared: 0.0544
+F-statistic: 6.42587 on 6 and 82 DF, p-value: 0.000014</code></pre>
+</div>
+</div>
+<p>This model accounts for two-ways (individual and time) effects. We may conclude that generally (and the term generally may be applied to all other coefficient interpretations for this set of comments) there is 12557.58 increase in the level of consumption when the price of natural gas increases by 1 unit. There is 8425.45 decrease in the level of consumption when the price of electricity increases by one unit. There is a 803.7 increase in the level of consumption when the price of distillate fuel oil increases by one unit. There is a 12545.43 increase in the level of consumption when the price of liquefied petroleum gas increases by one unit. There is a 60.55 increase in the level of consumption when heating degree days increase by one unit. And there is a 2.03 decrease in the level of consumption when per-capita personal income increases by one unit.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pFtest</span>(withinreg1, pooledreg1) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    F test for individual effects
+
+data:  consumption ~ price + eprice + oprice + lprice + heating + income
+F = 352, df1 = 4, df2 = 104, p-value &lt;2e-16
+alternative hypothesis: significant effects</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we reject the null so there seems like there are individual effects</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>We have implemented the F-test for individual effects. The null hypothesis is that there are no individual effects and the alternate hypothesis states that there are effects and we must use a model that accounts for these differences across individuals. We reject the null, indicating that there may be individual effects.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pFtest</span>(withinreg2, pooledreg1)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    F test for time effects
+
+data:  consumption ~ price + eprice + oprice + lprice + heating + income
+F = 3.6, df1 = 22, df2 = 86, p-value = 9e-06
+alternative hypothesis: significant effects</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we reject the null so there seems to be time effects as well.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>We have implemented the F-test for time effects. From the p-value, we reject the null hypothesis that there are no time effects and conclude that there may be time effects and we must use a model that accounts for these differences across years.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Random effects model</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>random_effects <span class="ot">&lt;-</span> <span class="fu">plm</span>(consumption <span class="sc">~</span> price <span class="sc">+</span> eprice  <span class="sc">+</span> oprice <span class="sc">+</span> lprice <span class="sc">+</span> heating <span class="sc">+</span> income, <span class="at">data=</span>natural_gas_pd, <span class="at">model=</span><span class="st">"random"</span>, <span class="at">random.method =</span> <span class="st">"amemiya"</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(random_effects)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Oneway (individual) effect Random Effect Model 
+   (Amemiya's transformation)
+
+Call:
+plm(formula = consumption ~ price + eprice + oprice + lprice + 
+    heating + income, data = natural_gas_pd, model = "random", 
+    random.method = "amemiya")
+
+Balanced Panel: n = 5, T = 23, N = 115
+
+Effects:
+                   var  std.dev share
+idiosyncratic 6.02e+08 2.45e+04  0.02
+individual    2.41e+10 1.55e+05  0.98
+theta: 0.967
+
+Residuals:
+   Min. 1st Qu.  Median 3rd Qu.    Max. 
+ -56760  -14490   -1843    9973   90718 
+
+Coefficients:
+            Estimate Std. Error z-value Pr(&gt;|z|)    
+(Intercept) 75764.96   87364.23    0.87    0.386    
+price        8422.00    9959.54    0.85    0.398    
+eprice      -7279.27    5735.91   -1.27    0.204    
+oprice         81.31     492.19    0.17    0.869    
+lprice      -7525.80    8569.24   -0.88    0.380    
+heating        45.26       9.92    4.56    5e-06 ***
+income          7.08       3.97    1.79    0.074 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    9.26e+10
+Residual Sum of Squares: 6.92e+10
+R-Squared:      0.252
+Adj. R-Squared: 0.211
+Chisq: 36.4203 on 6 DF, p-value: 2.28e-06</code></pre>
+</div>
+</div>
+<p>From the Random effects model, we may interpret the variables as such: For a 1 increase in the price of natural gas, as associate a 8422 unit increase in gas consumption. For a 1 unit increase in the price of electricity, we expect a 7279.27 unit decrease in gas consumption. For a 1 unit increase in the price of distillate fuel oil, we associate a 81.31 unit increase in gas consumption. For a 1 unit increase in the price of liquefied petroleum gas, we associate a 7525.8 unit decrease in gas consumption. For a 1 unit increase in the heating degree days, we associate a 45.26 unit increase in gas consumption. Finally, for a 1 unit icnrease in income, we associate a 7.08 unit increase in gas consumption.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Effects Test</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>consumptionReTest <span class="ot">&lt;-</span> <span class="fu">plmtest</span>(pooledreg1, <span class="at">effect=</span><span class="st">"twoways"</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>consumptionReTest</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Lagrange Multiplier Test - two-ways effects (Honda)
+
+data:  consumption ~ price + eprice + oprice + lprice + heating + income
+normal = 9.9, p-value &lt;2e-16
+alternative hypothesis: significant effects</code></pre>
+</div>
+</div>
+<p>The LM test shows that the null hypothesis of zero variance in the two-way specifc errors (of indvidiuals and time) is rejected; therefore, heterogeneity among individuals and time may be significant. Therefore, we should not use the pooled model.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compared fixed effects (two-ways) and REM</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">phtest</span>(withinreg3, random_effects)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Hausman Test
+
+data:  consumption ~ price + eprice + oprice + lprice + heating + income
+chisq = 28, df = 6, p-value = 0.0001
+alternative hypothesis: one model is inconsistent</code></pre>
+</div>
+</div>
+<p>From the Hausman Test, our p-value is well less than alpha = 0.05, and therefore we reject the null, which implies that one model is inconsistent and we implement the twoway fixed effect model as our preferred model. As we are to use the fixed effects, we would likely want to use the Hausman Taylor estimators, though we must ensure that we have enough instruments. The number of time-varying variables should be at least as much as the number of time-invariant variables.</p>
+<p>Discuss the potential real-world implications of your findings or possible applications. (eg. How might it inform a policy decision or translate to earning potential;how would this be quantified?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>withinreg3 <span class="ot">&lt;-</span> <span class="fu">plm</span>(consumption<span class="sc">~</span>price<span class="sc">+</span>eprice<span class="sc">+</span>oprice<span class="sc">+</span>lprice<span class="sc">+</span>heating<span class="sc">+</span>income, <span class="at">model=</span><span class="st">"within"</span>, <span class="at">effect =</span> <span class="st">"twoways"</span>, <span class="at">data=</span>natural_gas_pd)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(withinreg3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Twoways effects Within Model
+
+Call:
+plm(formula = consumption ~ price + eprice + oprice + lprice + 
+    heating + income, data = natural_gas_pd, effect = "twoways", 
+    model = "within")
+
+Balanced Panel: n = 5, T = 23, N = 115
+
+Residuals:
+   Min. 1st Qu.  Median 3rd Qu.    Max. 
+ -60442  -11674    -136   12153   56993 
+
+Coefficients:
+        Estimate Std. Error t-value Pr(&gt;|t|)    
+price   12557.58   11579.83    1.08     0.28    
+eprice  -8425.45    5926.83   -1.42     0.16    
+oprice    803.70    1000.90    0.80     0.42    
+lprice  12545.43   12460.36    1.01     0.32    
+heating    60.55      11.03    5.49  4.4e-07 ***
+income     -2.03       5.67   -0.36     0.72    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    6.12e+10
+Residual Sum of Squares: 4.16e+10
+R-Squared:      0.32
+Adj. R-Squared: 0.0544
+F-statistic: 6.42587 on 6 and 82 DF, p-value: 0.000014</code></pre>
+</div>
+</div>
+<p>In conclusion, from the analyses and tests that were run, we will implement the two-way fixed effect model as our preferred model. By controlling for both individual (state-specific) and time-specific unobserved heterogeneity, the model isolates the within-state, over-time variation in key variables such as energy prices, income, and weather (heating degree days). Heating degree days are highly significant, reaffirming the impact of climate on consumption. In contrast, income and prices show weaker within-state effects, suggesting that behavioral or structural consumption patterns are relatively stable in the short run. These findings could inform policy by emphasizing the limited short-run responsiveness of natural gas consumption to price signals. Instead structural changes such as updating energy efficiency standards or improving home insulation, may be more effective. Moreover, the large and significant role of heating degree days suggests that climate variability or change will continue to be a critical factor in energy planning and state-level resource allocation. A few limitations for our analyses include the small number of individual states as we only included 5 which limits the generalizability of the effects across states.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>© 2025, Prisha Narasimhan</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

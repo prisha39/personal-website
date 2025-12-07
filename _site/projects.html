@@ -80,9 +80,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-title',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-title-sort'] }],
+      valueNames: ['listing-title','listing-image','listing-subtitle',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-title","listing-author"],
+      searchColumns: ["listing-title","listing-author","listing-date","listing-image","listing-description"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -178,57 +178,87 @@ window.Quarto = {
 
 
 
-<section id="project-1" class="level2">
-<h2 class="anchored" data-anchor-id="project-1">Project 1</h2>
-<p>Here is my <a href="./projects/01-project.html">project 1</a></p>
-</section>
-<section id="project-2" class="level2">
-<h2 class="anchored" data-anchor-id="project-2">Project 2</h2>
-<p>Here is my <a href="./projects/02-project.html">project 2</a></p>
-<hr>
 <div class="project-listing">
 
 </div>
 
 
 
-</section>
 
-<div class="quarto-listing quarto-listing-container-table" id="listing-project-listing">
+<div class="quarto-listing quarto-listing-container-grid" id="listing-project-listing">
 <div class="listing-actions-group">
     <div class="input-group input-group-sm quarto-listing-filter">
       <span class="input-group-text"><i class="bi bi-search"></i></span>
       <input type="text" class="search form-control" placeholder="Filter">
     </div>
 </div>
-<table class="quarto-listing-table table">
-<thead>
-<tr>
-
-<th>
-Title
-</th>
-
-</tr>
-</thead>
-<tbody class="list">
-
-<tr data-index="0" data-listing-file-modified-sort="1765100170661" data-listing-reading-time-sort="1" data-listing-word-count-sort="3" data-listing-title-sort="Project 1" data-listing-filename-sort="01-project.qmd">
-<td>
-<a href="./projects/01-project.html" class="title listing-title">Project 1</a>
-</td>
-
-</tr>
-
-<tr data-index="1" data-listing-file-modified-sort="1765100156566" data-listing-reading-time-sort="1" data-listing-word-count-sort="6" data-listing-title-sort="Project 2" data-listing-filename-sort="02-project.qmd">
-<td>
-<a href="./projects/02-project.html" class="title listing-title">Project 2</a>
-</td>
-
-</tr>
-
-</tbody>
-</table>
+<div class="list grid quarto-listing-cols-3">
+<div class="g-col-1" data-index="0" data-listing-date-sort="1765008000000" data-listing-file-modified-sort="1765102874201" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2350">
+<a href="./projects/01-project.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./us_employment.png" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Economics 144 - US Employment Models
+</h5>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="1" data-listing-date-sort="1760511600000" data-listing-file-modified-sort="1765104144476" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1672">
+<a href="./projects/02-project.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./airpassengers.png" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Economics 144 - AirPassengers
+</h5>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="2" data-listing-date-sort="1760511600000" data-listing-file-modified-sort="1765105031220" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2799">
+<a href="./projects/03-project.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./natural_gas.png" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Economics 104 - Natural Gas Panel Dataset
+</h5>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="3" data-listing-date-sort="1760511600000" data-listing-file-modified-sort="1765104999229" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="17" data-listing-word-count-sort="3223">
+<a href="./projects/04-project.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./swiss_labor.png" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Economics 104 - Swiss Labor Market Dataset
+</h5>
+</div>
+</div></a>
+</div>
+<div class="g-col-1" data-index="4" data-listing-date-sort="1760511600000" data-listing-file-modified-sort="1765137340421" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16" data-listing-word-count-sort="3123">
+<a href="./projects/05-project.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img loading="lazy" src="./gym_members.png" class="thumbnail-image card-img" style="height: 150px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Economics 103 - Gym Members Exercise Tracking
+</h5>
+</div>
+</div></a>
+</div>
+</div>
 <div class="listing-no-matching d-none">No matching items</div>
 </div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

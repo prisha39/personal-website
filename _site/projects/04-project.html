@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Prisha Narasimhan">
+<meta name="dcterms.date" content="2025-10-15">
+<meta name="description" content="  This project analyzed the factors influencing labor force participation in Switzerland using the 1981 Swiss Labor Market Dataset. I conducted descriptive analyses of key variables, fitted LPM, Probit, and Logit models, and selected the Logit model as preferred, using average marginal effects to quantify how income, age, education, family structure, and foreign status affect participation.">
+
+<title>Economics 104 - Swiss Labor Market Dataset – personal website</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-5b4ad623e5705c0698d39aec6f10cf02.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">personal website</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../projects.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#a." id="toc-a." class="nav-link active" data-scroll-target="#a.">a.</a></li>
+  <li><a href="#b." id="toc-b." class="nav-link" data-scroll-target="#b.">b.</a></li>
+  <li><a href="#c." id="toc-c." class="nav-link" data-scroll-target="#c.">c.&nbsp;</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Economics 104 - Swiss Labor Market Dataset</h1>
+</div>
+
+<div>
+  <div class="description">
+    <p><br> This project analyzed the factors influencing labor force participation in Switzerland using the 1981 Swiss Labor Market Dataset. I conducted descriptive analyses of key variables, fitted LPM, Probit, and Logit models, and selected the Logit model as preferred, using average marginal effects to quantify how income, age, education, family structure, and foreign status affect participation.</p>
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Prisha Narasimhan </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 15, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="a." class="level2">
+<h2 class="anchored" data-anchor-id="a.">a.</h2>
+<p>Briefly discuss the question you are trying to answer with your model.</p>
+<p>We are using the Swiss Labor Market Participation Dataset from the 1981 Swiss Health Survey (SOMIPOPS) found in the Journal of Applied Economietrics Data Archive (Gerfin, 1996). The question we will be looking to answer is: “What factors influence whether an individual participates in the labor force in Switzerland?” Our (binary) dependent variable is participation, indicating whether an individual is active in the labor force (yes or no). The model includes six predictors: income (log of non-labor income), age (in decades), education (years of formal education), youngkids (number of children under 7), oldkids (number of children 7 or older), and foreign (whether the individual is a foreginer or Swiss). The model includes 2 categorical variables, participation (the dependent variable) and foreign, and 5 continuous variables (income, age, education, youngkids, and oldkids). The source of the data is: Gerfin, M. (1996). Parametric and Semi-Parametric Estimation of the Binary Response Model of Labour Market Participation, Journal of Applied Econometrics, 11, 321–339, available at http://qed.econ.queensu.ca/jae/1996-v11.3/gerfin/.</p>
+</section>
+<section id="b." class="level2">
+<h2 class="anchored" data-anchor-id="b.">b.</h2>
+<p>Provide a descriptive analysis of your variables.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(AER)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: car</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: carData</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: lmtest</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: zoo</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'zoo'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: sandwich</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: survival</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"SwissLabor"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>SwissLabor <span class="ot">&lt;-</span> SwissLabor</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Participation Percentages</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(SwissLabor<span class="sc">$</span>participation)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ no yes 
+471 401 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(<span class="fu">table</span>(SwissLabor<span class="sc">$</span>participation)) <span class="sc">*</span> <span class="dv">100</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+      no      yes 
+54.01376 45.98624 </code></pre>
+</div>
+</div>
+<p>The binary dependent variable participation indicates whether an individual participates in the Swiss laber force in the SwissLabor dataset. From the summary table, we see that about 54.01% of individuals participate in the Swiss labor force. This shows that majority of the sample participate in the labor force.</p>
+<p>Income Summary</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(AER)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pastecs)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"SwissLabor"</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stat.desc</span>(SwissLabor<span class="sc">$</span>income)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     nbr.val     nbr.null       nbr.na          min          max        range 
+8.720000e+02 0.000000e+00 0.000000e+00 7.186901e+00 1.237565e+01 5.188749e+00 
+         sum       median         mean      SE.mean CI.mean.0.95          var 
+9.317815e+03 1.064313e+01 1.068557e+01 1.396863e-02 2.741611e-02 1.701470e-01 
+     std.dev     coef.var 
+4.124888e-01 3.860242e-02 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(SwissLabor<span class="sc">$</span>income)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  7.187  10.472  10.643  10.686  10.887  12.376 </code></pre>
+</div>
+</div>
+<p>Histogram of Income with Density Plot</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(SwissLabor<span class="sc">$</span>income, <span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">breaks =</span> <span class="dv">10</span>, <span class="at">xlab =</span> <span class="st">"Income (log of non-labor income)"</span>, </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Histogram of Income"</span>, <span class="at">prob =</span> <span class="cn">TRUE</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">13</span>))</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(SwissLabor<span class="sc">$</span>income), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(SwissLabor<span class="sc">$</span>income, <span class="at">adjust =</span> .<span class="dv">5</span>), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"blue"</span>, </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">'l'</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rug</span>(SwissLabor<span class="sc">$</span>income)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="04-project_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The histogram of the Income (log of non-labor income) indicates that the distribution of the data is left skewed. Therefore we would be looking to use the median as opposed to the mean to measure the central tendency of the data. There is a large range of values, spanning from 7.187 to 12.376. The density plot illustrates a smooth, continuous estimate of the probability density function (PDF) of the data. The blue dotted line is a more precise depiction of the data estimates. It provides a clearer view of the distribution’s shape, allowing you to see peaks and valleys.</p>
+<p>Boxplot of Income</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(SwissLabor<span class="sc">$</span>income, <span class="at">ylab =</span> <span class="st">"Income (log of non-labor income)"</span>, </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Boxplot of Income"</span>, <span class="at">col =</span> <span class="st">"lightblue"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="04-project_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the boxplot of Income (log of non-labor income), we’re able to solidify a few key insights about the data that we learned through prior tools and figures. We’re able to see that the median of the data is between 10 and 11, which agrees with the true median of 10.643. We’re also able to see the rather small standard deviation of about 4.12e^-1. Both of the whiskers seem to be of similar size with outliers on either end. However, there is a potential outlier seeming to be at the minimum value, influencing the skew of the distribution. The appropriate values of Q1 and Q3 are also displayed, at 10.472 and 10.887, respectively. In addition, the box plot illustrates the min and max of the data, showing a difference of about 5 between the two.</p>
+<p>Age Summary</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pastecs)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stat.desc</span>(SwissLabor<span class="sc">$</span>age)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     nbr.val     nbr.null       nbr.na          min          max        range 
+8.720000e+02 0.000000e+00 0.000000e+00 2.000000e+00 6.200000e+00 4.200000e+00 
+         sum       median         mean      SE.mean CI.mean.0.95          var 
+3.484100e+03 3.900000e+00 3.995528e+00 3.573248e-02 7.013183e-02 1.113378e+00 
+     std.dev     coef.var 
+1.055167e+00 2.640871e-01 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(SwissLabor<span class="sc">$</span>age)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  2.000   3.200   3.900   3.996   4.800   6.200 </code></pre>
+</div>
+</div>
+<p>Histogram of Age with Density Plot</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(SwissLabor<span class="sc">$</span>age, <span class="at">col =</span> <span class="st">"coral"</span>, <span class="at">breaks =</span> <span class="dv">10</span>, <span class="at">xlab =</span> <span class="st">"Age (in decades)"</span>, </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Histogram of Age"</span>, <span class="at">prob =</span> <span class="cn">TRUE</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">7</span>))</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(SwissLabor<span class="sc">$</span>age), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(SwissLabor<span class="sc">$</span>age, <span class="at">adjust =</span> .<span class="dv">5</span>), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"blue"</span>, </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">'l'</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rug</span>(SwissLabor<span class="sc">$</span>age)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="04-project_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The histogram of Age (in decades), has a somewhat central peak and overall looks to behave more normally. To measure the central tendency of the data, we may use either median or mean as there doesn’t seem to be heavy skews or deviations from normality. There is a large range of values, spanning from 2 to 6.2. The density plot illustrates a smooth, continuous estimate of the probability density function (PDF) of the data. The blue dotted line is a more precise depiction of the data estimates. It provides a clearer view of the distribution’s shape, allowing you to see smaller peaks and valleys.</p>
+<p>Boxplot of Age</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(SwissLabor<span class="sc">$</span>age, <span class="at">ylab =</span> <span class="st">"Age (in decades)"</span>, </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Boxplot of Age"</span>, <span class="at">col =</span> <span class="st">"coral"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="04-project_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the boxplot of Age (in decades), we are able to solidify a few key insights about the data that we learned through prior tools and figures. We are able to see that the median of the data is between 3 and 5, which agrees with the true median of 3.9. We are also able to see that the standard deviation of about 1.055. Additionally, both whiskers seem to be of similar size, which no indication of outliers. The appropriate values of Q1 and Q3 are also displayed, at 3.2 and 4.8, respectively. The box plot also illustrates the min and max of the data, showing that the difference is quite large (in decades) between the two.</p>
+<p>Education Summary</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stat.desc</span>(SwissLabor<span class="sc">$</span>education)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     nbr.val     nbr.null       nbr.na          min          max        range 
+ 872.0000000    0.0000000    0.0000000    1.0000000   21.0000000   20.0000000 
+         sum       median         mean      SE.mean CI.mean.0.95          var 
+8116.0000000    9.0000000    9.3073394    0.1028207    0.2018053    9.2188669 
+     std.dev     coef.var 
+   3.0362587    0.3262220 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(SwissLabor<span class="sc">$</span>education)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   8.000   9.000   9.307  12.000  21.000 </code></pre>
+</div>
+</div>
+<p>Histogram of Education with Density Plot</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(SwissLabor<span class="sc">$</span>education, <span class="at">col =</span> <span class="st">"mediumaquamarine"</span>, <span class="at">breaks =</span> <span class="dv">10</span>, </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Education (years of formal education)"</span>, </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Histogram of Education"</span>, </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">prob =</span> <span class="cn">TRUE</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">25</span>))</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(SwissLabor<span class="sc">$</span>education), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(SwissLabor<span class="sc">$</span>education, <span class="at">adjust =</span> .<span class="dv">5</span>), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"blue"</span>, </span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">'l'</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="fu">rug</span>(SwissLabor<span class="sc">$</span>education)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="04-project_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The histogram of Education (years of formal schooling), indicates that the distribution is slightly right-skewed. So, we would be looking to use the median as opposed to the mean to measure the central tendency of the data. There is a large range of values, spanning from 1 to 21. The density plot illustrates a smooth, continuous estimate of the probability density function (PDF) of the data. The blue dotted line is a more precise depiction of the data estimates. It provides a clearer view of the distribution’s shape, allowing you to see smaller peaks and valleys.</p>
+<p>Boxplot of Education</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(SwissLabor<span class="sc">$</span>education, <span class="at">ylab =</span> <span class="st">"Education (years of schooling)"</span>, </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Boxplot of Education"</span>, <span class="at">col =</span> <span class="st">"mediumaquamarine"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="04-project_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the boxplot of Education (years of schooling), we are able to solidify a few key insights about the data that we learned about through prior tools and figures. We’re able to see that the median of the data is between 8 and 12, which agrees with the true median of 9. We are also able to see the standard deviation of about 3.03. Additionally, both of the whiskers looks to be of similar size, with a few outliers above the median, suggesting the slight right-skew of the distribution. The appropriate values of Q1 and Q3 are also displayed, at 8 and 12. In addition, the box plot illustrates the min and max of the data, showing that the difference rather large between the two. There are a few outliers shown in the box plot on either side of the median (though moreso above the median), matching our previous findings as well.</p>
+<p>Young kids Summary</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stat.desc</span>(SwissLabor<span class="sc">$</span>youngkids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     nbr.val     nbr.null       nbr.na          min          max        range 
+872.00000000 665.00000000   0.00000000   0.00000000   3.00000000   3.00000000 
+         sum       median         mean      SE.mean CI.mean.0.95          var 
+272.00000000   0.00000000   0.31192661   0.02075440   0.04073447   0.37560960 
+     std.dev     coef.var 
+  0.61286997   1.96478903 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(SwissLabor<span class="sc">$</span>youngkids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.3119  0.0000  3.0000 </code></pre>
+</div>
+</div>
+<p>Histogram of Young kids with Density Plot</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(SwissLabor<span class="sc">$</span>youngkids, <span class="at">col =</span> <span class="st">"indianred"</span>, <span class="at">breaks =</span> <span class="dv">10</span>, </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Young Kids (number of kids 7 or younger)"</span>, </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Histogram of Young Kids"</span>, <span class="at">prob =</span> <span class="cn">TRUE</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>))</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(SwissLabor<span class="sc">$</span>youngkids), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(SwissLabor<span class="sc">$</span>youngkids, <span class="at">adjust =</span> .<span class="dv">5</span>), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"blue"</span>, </span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">'l'</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rug</span>(SwissLabor<span class="sc">$</span>youngkids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="04-project_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The histogram of the Young Kids (number of kids individuals have that are 7 or younger), indicates that the distribution is extremely right-skewed. Therefore, we would be looking to use the median as opposed to the mean to measure the central tendency of the data. There is a shorter range of values, spanning from 0 to 3. The density plot illustrates a smooth, continuous estimate of the probability density function of the data. The blue dotted line is a more precise depiction of the data estimates. It provides a clearer view of the distribution’s shape, allowing you to see smaller peaks and valleys.</p>
+<p>Boxplot of Young kids</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(SwissLabor<span class="sc">$</span>youngkids, <span class="at">ylab =</span> <span class="st">"Young Kids"</span>, </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Boxplot of Young Kids"</span>, <span class="at">col =</span> <span class="st">"indianred"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="04-project_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the boxplot of youngkids (the number of kids an individual has that’s 7 or younger), we are able to solidify a few key insights about the data that we learned about through prior tools and figures. We are able to see that the median of the data is around 0, which agrees with the true median of 0. We are also able to see the standard deviation of about 0.612. Additionally, the comparatively large outliers above the median suggest the strong right-skew of the distribution. The values of Q1 and Q3 also seem to be around 0. Also, the box plot illustrates the min and max of the data, showing a difference of about 3 between the two. There are a few outliers shown in the box plot exceeding the standard deviation (all above the median), matching our previous findings as well.</p>
+<p>Old Kids Summary</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stat.desc</span>(SwissLabor<span class="sc">$</span>oldkids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     nbr.val     nbr.null       nbr.na          min          max        range 
+872.00000000 393.00000000   0.00000000   0.00000000   6.00000000   6.00000000 
+         sum       median         mean      SE.mean CI.mean.0.95          var 
+857.00000000   1.00000000   0.98279817   0.03680323   0.07223338   1.18110445 
+     std.dev     coef.var 
+  1.08678629   1.10580822 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(SwissLabor<span class="sc">$</span>oldkids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  1.0000  0.9828  2.0000  6.0000 </code></pre>
+</div>
+</div>
+<p>Histogram of Old Kids with Density Plot</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(SwissLabor<span class="sc">$</span>oldkids, <span class="at">col =</span> <span class="st">"sandybrown"</span>, <span class="at">breaks =</span> <span class="dv">10</span>, </span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Old Kids (number of kids older than 7)"</span>, </span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Histogram of Old Kids"</span>, <span class="at">prob =</span> <span class="cn">TRUE</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">25</span>))</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(SwissLabor<span class="sc">$</span>oldkids), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"red"</span>)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(SwissLabor<span class="sc">$</span>oldkids, <span class="at">adjust =</span> .<span class="dv">5</span>), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"blue"</span>, </span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">type =</span> <span class="st">'l'</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rug</span>(SwissLabor<span class="sc">$</span>oldkids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="04-project_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The histogram of the Old Kids (number of kids individuals have that are older than 7), indicates that the distribution is extremely right-skewed. Therefore, we would be looking to use the median as opposed to the mean to measure the central tendency of the data. There is a shorter range of values, spanning from 0 to 6. The density plot illustrates a smooth estimate with many of peaks and valleys of the probability density function of the data. The blue dotted line is a more precise depiction of the data estimatse. It provides a clearer view of the distribution’s shape, allowing you to see the many peaks and valleys.</p>
+<p>Boxplot of Old Kids</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(SwissLabor<span class="sc">$</span>oldkids, <span class="at">ylab =</span> <span class="st">"Old Kids"</span>, </span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Boxplot of Old Kids"</span>, <span class="at">col =</span> <span class="st">"sandybrown"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="04-project_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the boxplot of Old Kids (the number of kids an individual has that are older than 7), we are able to solidify a few key insights about the data that we learned about through prior tools and figures. We are able to see that the median of the data lies between 0 and 2, which agrees with the true median of 1. We are also able to see that the standard deviation of about 1.08. Additionally, the upper whisker is much longer, suggesting that the data has a right skew with more high values or outliers above the median. The appropriate values of Q1 and Q3 are also displayed, at 0 and 2. In addition, the box plot illustrates the min and max of the data, showing a difference of 6 between the two. There are a few outliers shown in the box plot exceeding the standard deviation (above the median), matching our previous findings as well.</p>
+<p>Foreign Percentages</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(SwissLabor<span class="sc">$</span>foreign)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ no yes 
+656 216 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(<span class="fu">table</span>(SwissLabor<span class="sc">$</span>foreign)) <span class="sc">*</span> <span class="dv">100</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+      no      yes 
+75.22936 24.77064 </code></pre>
+</div>
+</div>
+<p>The binary varialbe foreign indicates whether an individual is a foreigner (“yes) or not (”no”) in the SwissLabor dataset. From the summary table, we see that about 75.23% of individuals are not foreigners, while 24.8% are foreigners. This shows that majority of the sample consists of non-foreigners, while about a quarter of the sample are foreigners.</p>
+<p>Correlation Matrix</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># excludes catagorical/binary variables participation and foreign</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>numeric_data <span class="ot">&lt;-</span> SwissLabor[, <span class="fu">c</span>(<span class="st">"income"</span>, <span class="st">"age"</span>, <span class="st">"education"</span>, </span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"youngkids"</span>, <span class="st">"oldkids"</span>)]</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(numeric_data, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>cor_matrix</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               income         age   education   youngkids     oldkids
+income     1.00000000  0.00618126  0.32734578 -0.01733803  0.13910359
+age        0.00618126  1.00000000 -0.14929401 -0.51909274 -0.11620515
+education  0.32734578 -0.14929401  1.00000000  0.09834970 -0.03632097
+youngkids -0.01733803 -0.51909274  0.09834970  1.00000000 -0.23842829
+oldkids    0.13910359 -0.11620515 -0.03632097 -0.23842829  1.00000000</code></pre>
+</div>
+</div>
+<p>The correlation matrix displays the pairwise relationships betweeen several key continuous predictors in the dataset, including income (log of non-labor income), age (in decades), education (years of schooling), youngkids (number of kids less than 7), and oldkids (number of kids greater than 7). The participation and foreigner variable are not included due to their binary nature. A correlation close to 1 indicates a strong positive relationship, while a correlation close to -1 reflects a strong negative relationship. A correlation near 0 suggests no relationship. There appears to be a moderate positive correlation between education and income, indicating that individuals with higher education tend to have higher non-labor income. In contrast, there appears to be a moderately strong negative correlation between youngkids and age, indicating that younger individuals tend to have more young children. Additionally, there is a somewhat moderate negative correlation between youngkids and oldkids, suggesting that individuals with more children less than 7 tend to not have as many children greater than 7. Other correlations appear to be rather weak or negligible, suggesting low multicollinearity risks amongst predictors. Overall, the matrix helps identify which variables are more closely associated with one another, and informs further analysis and model building.</p>
+</section>
+<section id="c." class="level2">
+<h2 class="anchored" data-anchor-id="c.">c.&nbsp;</h2>
+<p>Fit the three models below, and identify which model is your preferred one.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># LPM </span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="co"># convert participation into a binary variable</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>SwissLabor<span class="sc">$</span>part_num <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(SwissLabor<span class="sc">$</span>participation <span class="sc">==</span> <span class="st">"yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="co"># fit LPM </span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>swiss.lpm <span class="ot">&lt;-</span> <span class="fu">lm</span>(part_num <span class="sc">~</span> income <span class="sc">+</span> age <span class="sc">+</span> education <span class="sc">+</span> youngkids </span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>                <span class="sc">+</span> oldkids <span class="sc">+</span> foreign, <span class="at">data =</span> SwissLabor)</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Probit</span></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>swiss.probit <span class="ot">&lt;-</span> <span class="fu">glm</span>(participation <span class="sc">~</span> income <span class="sc">+</span> age <span class="sc">+</span> education <span class="sc">+</span> </span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>                      youngkids <span class="sc">+</span> oldkids <span class="sc">+</span> foreign, </span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> SwissLabor, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"probit"</span>))</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Logit</span></span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>swiss.logit <span class="ot">&lt;-</span> <span class="fu">glm</span>(participation <span class="sc">~</span> income <span class="sc">+</span> age <span class="sc">+</span> education <span class="sc">+</span> youngkids <span class="sc">+</span> </span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>                     oldkids <span class="sc">+</span> foreign, </span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a>                   <span class="at">data =</span> SwissLabor, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the Models - AIC Tests</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(swiss.lpm)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1126.542</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(swiss.probit)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1066.983</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(swiss.logit)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1066.798</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># probit and logit are preferred with very similar results according to AIC tests</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the Models (probit and logit) - McFadden's R^2 (from scratch)</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="co"># probit McFadden</span></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>swiss.null_p <span class="ot">&lt;-</span> <span class="fu">glm</span>(participation <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> SwissLabor, </span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"probit"</span>))</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>logLik.full_p <span class="ot">&lt;-</span> <span class="fu">logLik</span>(swiss.probit)</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>logLik.null_p <span class="ot">&lt;-</span> <span class="fu">logLik</span>(swiss.null_p)</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>McFadden.R2_p <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> (<span class="fu">as.numeric</span>(logLik.full_p) <span class="sc">/</span> <span class="fu">as.numeric</span>(logLik.null_p))</span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>McFadden.R2_p</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1248651</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># logit McFadden</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>swiss.null_l <span class="ot">&lt;-</span> <span class="fu">glm</span>(participation <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> SwissLabor, </span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>))</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>logLik.full_l <span class="ot">&lt;-</span> <span class="fu">logLik</span>(swiss.logit)</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>logLik.null_l <span class="ot">&lt;-</span> <span class="fu">logLik</span>(swiss.null_l)</span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>McFadden.R2_l <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> (<span class="fu">as.numeric</span>(logLik.full_l) <span class="sc">/</span> <span class="fu">as.numeric</span>(logLik.null_l))</span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>McFadden.R2_l</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1250191</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Confusion Matrix - Split Data</span></span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: ggplot2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: lattice</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'caret'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:survival':
+
+    cluster</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>SwissLabor<span class="sc">$</span>part_num <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(SwissLabor<span class="sc">$</span>participation <span class="sc">==</span> <span class="st">"yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>SwissLabor<span class="sc">$</span>foreign_num <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(SwissLabor<span class="sc">$</span>foreign <span class="sc">==</span> <span class="st">"yes"</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Split into 70% train, 30% test</span></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>train_index <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>), <span class="fu">nrow</span>(SwissLabor), </span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.7</span>, <span class="fl">0.3</span>))</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create datasets</span></span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> SwissLabor[train_index, ]</span>
+<span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> SwissLabor[<span class="sc">!</span>train_index, ]</span>
+<span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a><span class="co"># LPM - Confusion Matrix</span></span>
+<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb68-13"><a href="#cb68-13" aria-hidden="true" tabindex="-1"></a>lpm_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(part_num <span class="sc">~</span> income <span class="sc">+</span> age <span class="sc">+</span> education <span class="sc">+</span> </span>
+<span id="cb68-14"><a href="#cb68-14" aria-hidden="true" tabindex="-1"></a>                  youngkids <span class="sc">+</span> oldkids <span class="sc">+</span> foreign_num, <span class="at">data =</span> train)</span>
+<span id="cb68-15"><a href="#cb68-15" aria-hidden="true" tabindex="-1"></a>pred_lpm <span class="ot">&lt;-</span> <span class="fu">predict</span>(lpm_model, <span class="at">newdata =</span> test)</span>
+<span id="cb68-16"><a href="#cb68-16" aria-hidden="true" tabindex="-1"></a>class_lpm <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(pred_lpm <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb68-17"><a href="#cb68-17" aria-hidden="true" tabindex="-1"></a><span class="fu">confusionMatrix</span>(<span class="fu">as.factor</span>(class_lpm), <span class="fu">as.factor</span>(test<span class="sc">$</span>part_num), <span class="at">positive =</span> <span class="st">"1"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 103  55
+         1  31  67
+                                          
+               Accuracy : 0.6641          
+                 95% CI : (0.6026, 0.7217)
+    No Information Rate : 0.5234          
+    P-Value [Acc &gt; NIR] : 3.568e-06       
+                                          
+                  Kappa : 0.3207          
+                                          
+ Mcnemar's Test P-Value : 0.01313         
+                                          
+            Sensitivity : 0.5492          
+            Specificity : 0.7687          
+         Pos Pred Value : 0.6837          
+         Neg Pred Value : 0.6519          
+             Prevalence : 0.4766          
+         Detection Rate : 0.2617          
+   Detection Prevalence : 0.3828          
+      Balanced Accuracy : 0.6589          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Probit - Confusion Matrix</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>probit_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(part_num <span class="sc">~</span> income <span class="sc">+</span> age <span class="sc">+</span> education <span class="sc">+</span> youngkids <span class="sc">+</span> </span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>                      oldkids <span class="sc">+</span> foreign_num, <span class="at">data =</span> train, </span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"probit"</span>))</span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>pred_probit <span class="ot">&lt;-</span> <span class="fu">predict</span>(probit_model, <span class="at">newdata =</span> test, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>class_probit <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(pred_probit <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a><span class="fu">confusionMatrix</span>(<span class="fu">as.factor</span>(class_probit), <span class="fu">as.factor</span>(test<span class="sc">$</span>part_num), <span class="at">positive =</span> <span class="st">"1"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 102  55
+         1  32  67
+                                         
+               Accuracy : 0.6602         
+                 95% CI : (0.5986, 0.718)
+    No Information Rate : 0.5234         
+    P-Value [Acc &gt; NIR] : 6.478e-06      
+                                         
+                  Kappa : 0.313          
+                                         
+ Mcnemar's Test P-Value : 0.01834        
+                                         
+            Sensitivity : 0.5492         
+            Specificity : 0.7612         
+         Pos Pred Value : 0.6768         
+         Neg Pred Value : 0.6497         
+             Prevalence : 0.4766         
+         Detection Rate : 0.2617         
+   Detection Prevalence : 0.3867         
+      Balanced Accuracy : 0.6552         
+                                         
+       'Positive' Class : 1              
+                                         </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Logit - Confusion Matrix</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>logit_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(part_num <span class="sc">~</span> income <span class="sc">+</span> age <span class="sc">+</span> education <span class="sc">+</span> youngkids <span class="sc">+</span> </span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>                     oldkids <span class="sc">+</span> foreign_num, <span class="at">data =</span> train, </span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">"logit"</span>))</span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>pred_logit <span class="ot">&lt;-</span> <span class="fu">predict</span>(logit_model, <span class="at">newdata =</span> test, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>class_logit <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(pred_logit <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a><span class="fu">confusionMatrix</span>(<span class="fu">as.factor</span>(class_logit), <span class="fu">as.factor</span>(test<span class="sc">$</span>part_num), <span class="at">positive =</span> <span class="st">"1"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 104  55
+         1  30  67
+                                          
+               Accuracy : 0.668           
+                 95% CI : (0.6066, 0.7254)
+    No Information Rate : 0.5234          
+    P-Value [Acc &gt; NIR] : 1.932e-06       
+                                          
+                  Kappa : 0.3283          
+                                          
+ Mcnemar's Test P-Value : 0.009237        
+                                          
+            Sensitivity : 0.5492          
+            Specificity : 0.7761          
+         Pos Pred Value : 0.6907          
+         Neg Pred Value : 0.6541          
+             Prevalence : 0.4766          
+         Detection Rate : 0.2617          
+   Detection Prevalence : 0.3789          
+      Balanced Accuracy : 0.6626          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>Based on the model selection criteria, the logit model is preferred. Both the probit and logit models yield similarly low AIC values, indicating comparable model fit, with the logit model showing a very slightly lower AIC. Additionally, the McFadden’s pseudo R² for the logit model is slightly higher than that of the probit model, reinforcing the choice of the logit model as the preferred specification. [If we include the confusion matrix: From the confusion matrix, accuracy of the linear probability model, the probit, and logit models, all yield very similar results, however the logit model is ever so slightly higher.] While the differences between the two models are rather minor, the logit model consistently performs slightly better on both metrics.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="co"># average marginal effects </span></span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(margins)</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a><span class="fu">margins</span>(swiss.logit)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Average marginal effects</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>glm(formula = participation ~ income + age + education + youngkids +     oldkids + foreign, family = binomial(link = "logit"), data = SwissLabor)</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  income     age education youngkids   oldkids foreignyes
+ -0.1699 -0.1064  0.006616   -0.2775 -0.004584     0.2834</code></pre>
+</div>
+</div>
+<p>Interpretations of Average Marginal Effects: Income: There is an decrease in the probability of participating in the Swiss labor force, by about 17 percentage points, as the log of income-labor income increases. Age: There is a decrease in the probability of participation in the Swiss labor force by about 10.6 percentage points, as for each additional increase in decades. Education: there is a slight increase in the probability of participating in the Swiss labor force, by about 0.66 percentage points, for increases in years of education. Youngkids: There is a decrease in probability of participating in the Swiss labor force, by about 27.7 percentage points, for each additional young child. Oldkids: There is an extremely slight decrease, essentially negligiible, in the probability of participation in the Swiss labor force for each additional older child. Foreign: There is an increase in the probability of participating in the Swiss labor force, by about 28.3 percentage points, from people who aren’t foreigners to those who are.</p>
+<p>Based on the logit model selected as the final model, we computed the Average Marginal Effects (AMEs). The results indicate that higher non-labor income, older age, and more young children significantly reduce the probability of labor force participation, while being a foreigner substantially increases it by approximately 28.3 percentage points. Education exerts a small positive effect, increasing participation likelihood marginally per additional year of schooling. The number of older children has little meaningful impact on participation. Overall, the logit model effectively indentifies the key socioeconomic and demographic factors that influence labor force participation in Switzerland, confirming our hypothesis that variables such as income, age, education, and family responsibilities may play crucial roles.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+<p>© 2025, Prisha Narasimhan</p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -13,6 +13,8 @@ about:
     - text: Email
       url: "mailto:prisha39@gmail.com"
       icon: inbox-fill
+    - text: Resume
+      url: "resume.pdf"
 toc: FALSE
 ---
 
@@ -20,16 +22,16 @@ Finley Malloc is the Chief Data Scientist at Wengo Analytics. When not innovatin
 
 ## Education
 
-University of California, San Diego | San Diego, CA
-PhD in Mathematics | Sept 2011 - June 2015
-
-Macalester College | St. Paul, MN
-B.A in Economics | Sept 2007 - June 2011
-
-Download [Resume](/resume.pdf)
+University of California, Los Angeles | Los Angeles, CA <br>
+BAS in Statistics and Data Science and Economics <br>
+Minor in Global Studies | Sept 2022 - March 2026
 
 ## Experience
 
-Wengo Analytics | Head Data Scientist | April 2018 - present
+Deloitte Consulting | Intern | June 2025 - September 2025 <br>
 
-GeoScynce | Chief Analyst | Spet 2012 - April 2018
+R2 Global Technology Services | Business and Technology Intern | June 2024 - September 2024 <br>
+
+US Department of Energy: Loans Program Office | Intern | December 2023 - March 2024 <br>
+
+Sam Technology | Operations Intern | March 2023 - May 2023 <br>

@@ -1,0 +1,323 @@
+---
+title: "Economics 103 - Gym Members Exercise Tracking"
+image: ../gym_members.png
+author: "Prisha Narasimhan"
+date: "2025-10-15"
+output:
+  pdf_document: default
+  html_document: default
+description: |
+  <br>
+  This project built and refined a multiple regression model to understand how factors such as BMI, height, body composition, water intake, workout habits, and demographics influence weight. We applied log transformations, evaluated model assumptions, tested for multicollinearity, interactions, and misspecification, and validated the model through bootstrapping and cross-validation to identify the best-fitting and most reliable specification.
+---  
+
+```{r}
+library(readr)
+gym_members_exercise_tracking <- read_csv("~/Econ 103/gym_members_exercise_tracking.csv")
+data = gym_members_exercise_tracking
+```
+
+# Model Building
+
+Basic Multiple Regression Model
+```{r}
+model <- lm(`Weight (kg)` ~ BMI + `Height (m)` + Fat_Percentage + 
+              `Water_Intake (liters)` + `Session_Duration (hours)` + Gender + 
+              Workout_Type, 
+            data = gym_members_exercise_tracking)
+plot(model)
+```
+# Test for Transformations
+
+```{r}
+gym_members_exercise_tracking$log_Weight <- 
+  log(gym_members_exercise_tracking$`Weight (kg)`)
+gym_members_exercise_tracking$log_BMI <- log(gym_members_exercise_tracking$BMI)
+gym_members_exercise_tracking$log_Height <- 
+  log(gym_members_exercise_tracking$`Height (m)`)
+
+model_log <- lm(log_Weight ~ log_BMI + log_Height + Fat_Percentage + 
+                  `Water_Intake (liters)` + `Session_Duration (hours)` + Gender 
+                + Workout_Type, 
+                data = gym_members_exercise_tracking)
+summary(model_log)
+```
+
+# Apply the 3 log transformations that we found necessary earlier. 
+
+Candidate Model 
+```{r}
+can_model <- lm(log_Weight ~ log_BMI + log_Height + Fat_Percentage + 
+                  `Water_Intake (liters)` + `Session_Duration (hours)` + Gender 
+                + Workout_Type, 
+                data = gym_members_exercise_tracking)
+can_model
+```
+
+Based on the tests run so far, the candidate model accounts for the necessary transformations required on the response and the predictors. With this candidate model, we are trying to find if there is a positive linear relationship between the response variable of weight and the 7 predictors (BMI, height, fat percentage, water intake, session duraction, gender, and workout type). This model is ideally able to take in the appropriately transformed variables and find if in fact there is such positive linear relationship as well as investigate other questions such as if there is multicollinearity between the factor variables and if certain predictors affect weight more than others. The above model is therefore the ideal candidate model to answer such questions. 
+
+# Residual Plot Transformed Model
+
+```{r}
+plot(model_log, which = 1)
+```
+
+Residual Plot is randomly scattered around 0, indicating a good plot. Compared to the untransformed data, the residuals of the candidate model appear much more evenly distributed around the horizontal line at 0. However, the only area of concern is that there appears to be a slight narrowing of the residuals as the fitted values increase, hinting that there may be larger variances for smaller values. 
+
+# QQ Plot 
+```{r}
+library(car)
+qqPlot(model_log)
+outlierTest(model_log)
+```
+
+QQ Plot follows a straight line in general, indicating a normal distribution. However, 868 and 909 appear to be outliers. However, checking with a Bonferroni outlier test shows that these are not significant outliers. 
+
+# Jarque Bera Test
+```{r}
+library(tseries)
+# Jarque Bera Test for Untransformed Model
+jarque.bera.test(model$residuals)
+
+# Jarque Bera Test for Candidate Model
+jarque.bera.test(model_log$residuals) 
+```
+
+Using the residual plot for the candidate model, the qq-plot, and the Jarque Bera test, we see that there is no need for further transformations on the candidate model. While the Jarque Bera test p-value is rather low, the p-value for the transformed model is much larger than that of the untransformed model, and furthermore, based on the residual plot we may conclude that there is ultimately no need for further transformation as the scatter is overall random around the horizontal line at 0, indicating a more normal distribution. 
+
+# Cook's Distance Plot
+```{r}
+library(car)
+influenceIndexPlot(model_log, id=list(n=3), vars = "Cook", 
+                   main = "Cook's Distance Plot (Top 3 Influential Points)")
+```
+
+The Cook's Distance Plot also identifies the same infuential points as the QQ Plot, 868 and 909 as well as point 170. 
+
+# Outlier and Leverage Diagnostics
+```{r}
+library(olsrr)
+ols_plot_resid_lev(model_log)
+```
+
+Considering the transformed residual plot, qq plot, Cook's distance plot, and the Outlier and Leverage Diagnostics, while there are outliers such as points 868, 909, and 170, they would not need to be removed. In the qqplot the outliers outlined are within the 95% confidence interval in addition to the Bonferroni outlier test which demonstrated that these outliers were not significant. Furthermore, as the residual plot of the candidate model is fairly scattered, suggesting that the model assumptions are upheld, the inclusion of the outliers does not appear to distort the overall randomness of the residuals. Therefore, it is reasonable to retain the outliers in this analysis. 
+
+# AIC for Model Selection
+```{r}
+library(broom)
+library(POE5Rdata)
+model_log.mod1 <- lm(log_Weight~ log_BMI, data = gym_members_exercise_tracking)
+model_log.mod2 <- lm(log_Weight~ log_BMI + log_Height, 
+                     data = gym_members_exercise_tracking)
+model_log.mod3 <- lm(log_Weight~ log_BMI + log_Height + Fat_Percentage, 
+                     data = gym_members_exercise_tracking)
+model_log.mod4 <- lm(log_Weight~ log_BMI + log_Height + Fat_Percentage + 
+                       `Water_Intake (liters)`, 
+                     data = gym_members_exercise_tracking)
+model_log.mod5 <- lm(log_Weight~ log_BMI + log_Height + Fat_Percentage + 
+                       `Water_Intake (liters)` + `Session_Duration (hours)`, 
+                data = gym_members_exercise_tracking)
+model_log.mod6 <- lm(log_Weight~ log_BMI + log_Height + Fat_Percentage + 
+                       `Water_Intake (liters)` + `Session_Duration (hours)` + 
+                       Gender, 
+                data = gym_members_exercise_tracking)
+model_log.mod7 <- lm(log_Weight~ log_BMI + log_Height + Fat_Percentage + 
+                       `Water_Intake (liters)` + `Session_Duration (hours)` + 
+                       Gender + Workout_Type, 
+                data = gym_members_exercise_tracking)
+AIC(model_log.mod1, model_log.mod2, model_log.mod3, model_log.mod4, 
+    model_log.mod5, model_log.mod6, model_log.mod7)
+```
+
+According to the AIC model, the preferred model is Model 2, which only includes BMI and height. 
+
+# BIC for Model Selection
+```{r}
+library(broom)
+library(POE5Rdata)
+model_log.mod1 <- lm(log_Weight~ log_BMI, data = gym_members_exercise_tracking)
+model_log.mod2 <- lm(log_Weight~ log_BMI + log_Height, 
+                     data = gym_members_exercise_tracking)
+model_log.mod3 <- lm(log_Weight~ log_BMI + log_Height + Fat_Percentage, 
+                     data = gym_members_exercise_tracking)
+model_log.mod4 <- lm(log_Weight~ log_BMI + log_Height + Fat_Percentage + 
+                       `Water_Intake (liters)`, 
+                     data = gym_members_exercise_tracking)
+model_log.mod5 <- lm(log_Weight~ log_BMI + log_Height + Fat_Percentage + 
+                       `Water_Intake (liters)` + `Session_Duration (hours)`, 
+                data = gym_members_exercise_tracking)
+model_log.mod6 <- lm(log_Weight~ log_BMI + log_Height + Fat_Percentage + 
+                       `Water_Intake (liters)` + `Session_Duration (hours)` + 
+                       Gender, 
+                data = gym_members_exercise_tracking)
+model_log.mod7 <- lm(log_Weight~ log_BMI + log_Height + Fat_Percentage + 
+                       `Water_Intake (liters)` + `Session_Duration (hours)` + 
+                       Gender + Workout_Type, 
+                data = gym_members_exercise_tracking)
+BIC(model_log.mod1, model_log.mod2, model_log.mod3, model_log.mod4, 
+    model_log.mod5, model_log.mod6, model_log.mod7)
+```
+
+According to the BIC model, the preferred model is Model 2, which only includes BMI and height. 
+
+# Multicollinearity 
+```{r}
+library(car)
+vif(model_log)
+```
+
+Using threshold 4, we keep all variables. 
+
+# Compare Transformed Model to Original
+```{r}
+model_original <- lm(`Weight (kg)` ~ BMI + `Height (m)` + Fat_Percentage + 
+                       `Water_Intake (liters)` + `Session_Duration (hours)` + 
+                       Gender + Workout_Type, 
+                     data = gym_members_exercise_tracking)
+
+AIC(model_original, model_log)
+BIC(model_original, model_log)
+```
+
+A Lower AIC and BIC Indicate a better fit compared to the original model. 
+
+```{r}
+predicted_log_weight <- predict(model_log, gym_members_exercise_tracking)
+actual_log_weight <- gym_members_exercise_tracking$log_Weight
+
+plot(predicted_log_weight, actual_log_weight, main = "Predicted vs Actual
+     (Log-Transformed Weight)",
+     xlab = "Predicted Log Weight", ylab = "Actual Log Weight", col = "blue")
+abline(0, 1, col = "red") 
+```
+
+Also by visualizing the data we can see that the transformed model does a good job. I tested for multicollinearity by using the VIF method, and based on the threshold of 4, we do not need to remove any of the variables. Furthermore, comparing the AIC and BIC values for the untransformed data to the transformed candidate model, the canidate model seems to have a much better fit as AIC and BIC value is far smaller. Finally, we compared our candidate model to the actual data which was fairly aligned indicating that the model is a good fit of the data.
+
+# Model Misspecification Ramsey Reset
+```{r}
+library(car)
+library(POE5Rdata)
+library(lmtest)
+reset_test <- resettest(model_log, power = 2:3, type = "fitted")
+print(reset_test)
+```
+
+By running the RESET test, we see that the P-Value of 0.3112 is large enough at the 95% confidence level to fail to reject the null, so a nonlinear term is not needed. This indicates that there is no strong evidence to suggest that important unobserved variables are omitted from the model. Moreover, this implies that the candidate model is likely appropriate for understanding the relationship between the response variable, weight,and the predictor variables.
+
+# Test for Interaction Terms
+```{r}
+library(POE5Rdata)
+library(effects)
+model_log1 <- lm(log_Weight~log_BMI+log_Height+Fat_Percentage+
+                   `Water_Intake (liters)`+`Session_Duration (hours)`+ `Gender` + `Workout_Type` + log_BMI:log_Height, data = gym_members_exercise_tracking)
+model_log2 <- lm(log_Weight~log_BMI+log_Height+Fat_Percentage+
+                   `Water_Intake (liters)`+`Session_Duration (hours)`+ `Gender` + `Workout_Type`+ log_Height:Fat_Percentage, data = gym_members_exercise_tracking)
+model_log3 <- lm(log_Weight~log_BMI+log_Height+Fat_Percentage+
+                   `Water_Intake (liters)`+`Session_Duration (hours)`+ `Gender` + `Workout_Type` + `Water_Intake (liters)`:Fat_Percentage, data = gym_members_exercise_tracking)
+model_log4 <- lm(log_Weight~log_BMI+log_Height+Fat_Percentage+
+                   `Water_Intake (liters)`+`Session_Duration (hours)`+ `Gender` + `Workout_Type` + `Gender`:`Workout_Type` , data = gym_members_exercise_tracking)
+
+summary(model_log1)
+summary(model_log2)
+summary(model_log3)
+summary(model_log4)
+```
+
+Using the p-value of coefficients, we see that the model is not statistically significant among the interaction terms, so we won't need to include them.
+
+# Bootstrapping Log Transformed Model with Interaction Variable
+```{r}
+library(boot)
+library(ggplot2)
+
+bootstrap_function <- function(data, indices) {
+  resampled_data <- data[indices, ]
+
+  model_resampled <- lm(log_Weight ~ log_BMI * Fat_Percentage + log_Height + 
+                        `Water_Intake (liters)` + `Session_Duration (hours)`, 
+                        data = resampled_data)
+  return(coef(model_resampled))  }
+set.seed(123) 
+boot_results <- boot(data = gym_members_exercise_tracking, statistic = bootstrap_function, R = 1000)
+boot_results
+```
+```{r}
+colnames(boot_results$t) <- names(coef(lm(log_Weight ~ log_BMI * Fat_Percentage + log_Height + 
+                                         `Water_Intake (liters)` + `Session_Duration (hours)`, 
+                                         data = gym_members_exercise_tracking)))
+
+interaction_coefficients <- boot_results$t[, "log_BMI:Fat_Percentage"]
+
+hist(interaction_coefficients, 
+     main = "Bootstrap Distribution of log_BMI:Fat_Percentage Interaction Coefficient", 
+     xlab = "Interaction Coefficient (log_BMI:Fat_Percentage)", 
+     col = "lightblue", 
+     border = "black", 
+     breaks = 30)
+```
+
+The Histogram looks fairly symmetric and normally distributed. Based on this histogram, the sampling distribution of the predictors are overall approximately normal, which suggests that the inference methods relying on normality may still be reasonably robust. 
+
+# Cross Validation
+```{r}
+if (!require(caret)) install.packages("caret")
+library(caret)
+```
+
+```{r}
+set.seed(123) 
+cv_control <- trainControl(method = "cv", number = 10)
+
+cv_model <- train(log_Weight ~ log_BMI * Fat_Percentage + log_Height + 
+                  `Water_Intake (liters)` + `Session_Duration (hours)`, 
+                  data = gym_members_exercise_tracking, 
+                  method = "lm",  
+                  trControl = cv_control)
+print(cv_model)
+
+cat("Cross-Validated RMSE:", cv_model$results$RMSE, "\n")
+cat("Cross-Validated R-Squared:", cv_model$results$Rsquared, "\n")
+```
+
+RMSE of 0.0001299402 suggests that the model's predictions of log_Weight deviate only slightly from the observed values. An R-squared value of 0.9999998 means that nearly all the variability in log_Weight is explained by the predictors, including the interaction term. A MAE of 0.0001083176 is very close to zero, further confirming the model's strong predictive power.
+
+# Check for Overfitting since R-squared value is so high
+```{r}
+set.seed(123)
+train_indices <- createDataPartition(gym_members_exercise_tracking$log_Weight, p = 0.8, list = FALSE)
+training_data <- gym_members_exercise_tracking[train_indices, ]
+testing_data <- gym_members_exercise_tracking[-train_indices, ]
+
+model_train <- lm(log_Weight ~ log_BMI * Fat_Percentage + log_Height + 
+                  `Water_Intake (liters)` + `Session_Duration (hours)`, 
+                  data = training_data)
+
+train_predictions <- predict(model_train, newdata = training_data)
+train_rmse <- sqrt(mean((train_predictions - training_data$log_Weight)^2))
+train_r2 <- 1 - sum((train_predictions - training_data$log_Weight)^2) / 
+                sum((training_data$log_Weight - mean(training_data$log_Weight))^2)
+
+cat("Training RMSE:", train_rmse, "\n")
+cat("Training R²:", train_r2, "\n")
+
+test_predictions <- predict(model_train, newdata = testing_data)
+test_rmse <- sqrt(mean((test_predictions - testing_data$log_Weight)^2))
+test_r2 <- 1 - sum((test_predictions - testing_data$log_Weight)^2) / 
+               sum((testing_data$log_Weight - mean(testing_data$log_Weight))^2)
+
+cat("Test RMSE:", test_rmse, "\n")
+cat("Test R²:", test_r2, "\n")
+```
+
+The slightly lower RMSE on the test set (0.0001237238) suggests that the model generalizes very well to unseen data and does not overfit. The identical R² values for both the training and test sets suggest that the model performs equally well on unseen data as it does on the data it was trained on, confirming no signs of overfitting.
+
+# Favorite Specification
+
+In our analysis, using the Jarque Bera test, the qq plot, and the residual plot of the candidate model, we found that there is no need for further transformations on our model. Based on the Cook's Distance plot, the Outlier and Leverage Diagnostic plot, with inferences from the residual plot, we noted that while there are outliers in our model, they do not need to be removed. Using the AIC and BIC model, along with the VIF method, we tested for multicollinearity and noted that no variables needed to be removed. To test model misspecification, we ran the RESET test and as the p-value was not statistically significant, we concluded that nonlinear terms were not needed in the model. We additionally tested interactions between variables and found that there were no significant interactions to include amongst the ones tested. Finally, using the boostrap method, the resulting histogram was overall normally distributed resulting in a reasonable amount of robustness. A preferred form of analysis was the RESET test, as it's p-value indicated whether nonlinear terms were needed in the model, and furthermore if there were any unobserved omitted variables (which may have been the cause if the p-value was below 0.05). This test incorporates our understanding of the p-value to test specific characteristics on the model and encourage changes such as a quardratic variable or to think further about unobserved variables when the p-value is significant. 
+
+# Conclusion
+```{r}
+summary(model_log)
+```
+
+Upon building and testing our model through various forms of analysis, we may now use it to help answer some of our motivating questions. Using the estimated values shown in the above summary of our model, we are able to observe whether there is a linear relationship between our reponse variable weight, and each of the seven predictors. We notice that BMI and Height have a positive linear relationship with weight therefore the marginal effect from an increase in either of these variables will have an increase in weight as well. This may be due to the fact that BMI and Height have a direct relationship with weight as BMI times Height (m)^2 is equal to weight, indicating a direct positive relationship. BMI and Height therefore seem to have a stronger relationship to weight, which is further assured by AIC and BIC models in which the preferred model included only BMI and Height. Additionally, from our model, we observe that Water Intake (liters), Strength Workouts and Yoga Workout, have a positive linear relationship with weight (based on their marginal effects), suggesting that increased water intake, a higher frequency of strength and yoga workouts may be associated with higher weight when considered marginally.  Fat percentage, gender (male), Session duration, and HIIT Workout have negative marginal effects in relation to weight. This suggests that these variables are associated with reductions in weight when considered marginally. 

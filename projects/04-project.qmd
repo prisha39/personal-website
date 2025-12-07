@@ -1,0 +1,302 @@
+---
+title: "Economics 104 - Swiss Labor Market Dataset"
+image: ../swiss_labor.png
+author: "Prisha Narasimhan"
+date: "2025-10-15"
+output:
+  pdf_document: default
+  html_document: default
+description: |
+  <br>
+  This project analyzed the factors influencing labor force participation in Switzerland using the 1981 Swiss Labor Market Dataset. I conducted descriptive analyses of key variables, fitted LPM, Probit, and Logit models, and selected the Logit model as preferred, using average marginal effects to quantify how income, age, education, family structure, and foreign status affect participation.
+--- 
+
+## a. 
+
+Briefly discuss the question you are trying to answer with your model.
+
+We are using the Swiss Labor Market Participation Dataset from the 1981 Swiss Health Survey (SOMIPOPS) found in the Journal of Applied Economietrics Data Archive (Gerfin, 1996). The question we will be looking to answer is: "What factors influence whether an individual participates in the labor force in Switzerland?" Our (binary) dependent variable is participation, indicating whether an individual is active in the labor force (yes or no). The model includes six predictors: income (log of non-labor income), age (in decades), education (years of formal education), youngkids (number of children under 7), oldkids (number of children 7 or older), and foreign (whether the individual is a foreginer or Swiss). The model includes 2 categorical variables, participation (the dependent variable) and foreign, and 5 continuous variables (income, age, education, youngkids, and oldkids). The source of the data is: Gerfin, M. (1996). Parametric and Semi-Parametric Estimation of the Binary Response Model of Labour Market Participation, Journal of Applied Econometrics, 11, 321–339, available at http://qed.econ.queensu.ca/jae/1996-v11.3/gerfin/.
+
+## b. 
+
+Provide a descriptive analysis of your variables.
+
+```{r}
+library(AER)
+data("SwissLabor")
+SwissLabor <- SwissLabor
+```
+
+Participation Percentages
+```{r}
+table(SwissLabor$participation)
+prop.table(table(SwissLabor$participation)) * 100
+```
+The binary dependent variable participation indicates whether an individual participates in the Swiss laber force in the SwissLabor dataset. From the summary table, we see that about 54.01% of individuals participate in the Swiss labor force. This shows that majority of the sample participate in the labor force. 
+
+Income Summary
+```{r}
+library(AER)
+library(pastecs)
+data("SwissLabor")
+stat.desc(SwissLabor$income)
+summary(SwissLabor$income)
+```
+
+Histogram of Income with Density Plot
+```{r}
+hist(SwissLabor$income, col = "lightblue", breaks = 10, xlab = "Income (log of non-labor income)", 
+     main = "Histogram of Income", prob = TRUE, xlim = c(7, 13))
+lines(density(SwissLabor$income), lwd = 2, col = "red")
+lines(density(SwissLabor$income, adjust = .5), lwd = 2, col = "blue", 
+      type = 'l', lty = 2)
+rug(SwissLabor$income)
+```
+
+The histogram of the Income (log of non-labor income) indicates that the distribution of the data is left skewed. Therefore we would be looking to use the median as opposed to the mean to measure the central tendency of the data. There is a large range of values, spanning from 7.187 to 12.376. The density plot illustrates a smooth, continuous estimate of the probability density function (PDF) of the data. The blue dotted line is a more precise depiction of the data estimates. It provides a clearer view of the distribution's shape, allowing you to see peaks and valleys. 
+
+Boxplot of Income
+```{r}
+boxplot(SwissLabor$income, ylab = "Income (log of non-labor income)", 
+        main = "Boxplot of Income", col = "lightblue")
+```
+
+From the boxplot of Income (log of non-labor income), we're able to solidify a few key insights about the data that we learned through prior tools and figures. We're able to see that the median of the data is between 10 and 11, which agrees with the true median of 10.643. We're also able to see the rather small standard deviation of about 4.12e^-1. Both of the whiskers seem to be of similar size with outliers on either end. However, there is a potential outlier seeming to be at the minimum value, influencing the skew of the distribution. The appropriate values of Q1 and Q3 are also displayed, at 10.472 and 10.887, respectively. In addition, the box plot illustrates the min and max of the data, showing a difference of about 5 between the two. 
+
+Age Summary
+```{r}
+library(pastecs)
+stat.desc(SwissLabor$age)
+summary(SwissLabor$age)
+```
+
+Histogram of Age with Density Plot
+```{r}
+hist(SwissLabor$age, col = "coral", breaks = 10, xlab = "Age (in decades)", 
+     main = "Histogram of Age", prob = TRUE, xlim = c(1,7))
+lines(density(SwissLabor$age), lwd = 2, col = "red")
+lines(density(SwissLabor$age, adjust = .5), lwd = 2, col = "blue", 
+      type = 'l', lty = 2)
+rug(SwissLabor$age)
+```
+
+The histogram of Age (in decades), has a somewhat central peak and overall looks to behave more normally. To measure the central tendency of the data, we may use either median or mean as there doesn't seem to be heavy skews or deviations from normality. There is a large range of values, spanning from 2 to 6.2. The density plot illustrates a smooth, continuous estimate of the probability density function (PDF) of the data. The blue dotted line is a more precise depiction of the data estimates. It provides a clearer view of the distribution's shape, allowing you to see smaller peaks and valleys.
+
+Boxplot of Age
+```{r}
+boxplot(SwissLabor$age, ylab = "Age (in decades)", 
+        main = "Boxplot of Age", col = "coral")
+```
+
+From the boxplot of Age (in decades), we are able to solidify a few key insights about the data that we learned through prior tools and figures. We are able to see that the median of the data is between 3 and 5, which agrees with the true median of 3.9. We are also able to see that the standard deviation of about 1.055. Additionally, both whiskers seem to be of similar size, which no indication of outliers. The appropriate values of Q1 and Q3 are also displayed, at 3.2 and 4.8, respectively. The box plot also illustrates the min and max of the data, showing that the difference is quite large (in decades) between the two. 
+
+Education Summary
+```{r}
+stat.desc(SwissLabor$education)
+summary(SwissLabor$education)
+```
+
+Histogram of Education with Density Plot
+```{r}
+hist(SwissLabor$education, col = "mediumaquamarine", breaks = 10, 
+     xlab = "Education (years of formal education)", 
+     main = "Histogram of Education", 
+     prob = TRUE, xlim = c(0, 25))
+lines(density(SwissLabor$education), lwd = 2, col = "red")
+lines(density(SwissLabor$education, adjust = .5), lwd = 2, col = "blue", 
+      type = 'l', lty = 2)
+rug(SwissLabor$education)
+```
+
+The histogram of Education (years of formal schooling), indicates that the distribution is slightly right-skewed. So, we would be looking to use the median as opposed to the mean to measure the central tendency of the data. There is a large range of values, spanning from 1 to 21. The density plot illustrates a smooth, continuous estimate of the probability density function (PDF) of the data. The blue dotted line is a more precise depiction of the data estimates. It provides a clearer view of the distribution's shape, allowing you to see smaller peaks and valleys.
+
+Boxplot of Education
+```{r}
+boxplot(SwissLabor$education, ylab = "Education (years of schooling)", 
+        main = "Boxplot of Education", col = "mediumaquamarine")
+```
+
+From the boxplot of Education (years of schooling), we are able to solidify a few key insights about the data that we learned about through prior tools and figures. We're able to see that the median of the data is between 8 and 12, which agrees with the true median of 9. We are also able to see the standard deviation of about 3.03. Additionally, both of the whiskers looks to be of similar size, with a few outliers above the median, suggesting the slight right-skew of the distribution. The appropriate values of Q1 and Q3 are also displayed, at 8 and 12. In addition, the box plot illustrates the min and max of the data, showing that the difference rather large between the two. There are a few outliers shown in the box plot on either side of the median (though moreso above the median), matching our previous findings as well. 
+
+Young kids Summary
+```{r}
+stat.desc(SwissLabor$youngkids)
+summary(SwissLabor$youngkids)
+```
+
+Histogram of Young kids with Density Plot
+```{r}
+hist(SwissLabor$youngkids, col = "indianred", breaks = 10, 
+     xlab = "Young Kids (number of kids 7 or younger)", 
+     main = "Histogram of Young Kids", prob = TRUE, xlim = c(0, 4))
+lines(density(SwissLabor$youngkids), lwd = 2, col = "red")
+lines(density(SwissLabor$youngkids, adjust = .5), lwd = 2, col = "blue", 
+      type = 'l', lty = 2)
+rug(SwissLabor$youngkids)
+```
+
+The histogram of the Young Kids (number of kids individuals have that are 7 or younger), indicates that the distribution is extremely right-skewed. Therefore, we would be looking to use the median as opposed to the mean to measure the central tendency of the data. There is a shorter range of values, spanning from 0 to 3. The density plot illustrates a smooth, continuous estimate of the probability density function of the data. The blue dotted line is a more precise depiction of the data estimates. It provides a clearer view of the distribution's shape, allowing you to see smaller peaks and valleys.
+
+Boxplot of Young kids
+```{r}
+boxplot(SwissLabor$youngkids, ylab = "Young Kids", 
+        main = "Boxplot of Young Kids", col = "indianred")
+```
+
+From the boxplot of youngkids (the number of kids an individual has that's 7 or younger), we are able to solidify a few key insights about the data that we learned about through prior tools and figures. We are able to see that the median of the data is around 0, which agrees with the true median of 0. We are also able to see the standard deviation of about 0.612. Additionally, the comparatively large outliers above the median suggest the strong right-skew of the distribution. The values of Q1 and Q3 also seem to be around 0. Also, the box plot illustrates the min and max of the data, showing a difference of about 3 between the two. There are a few outliers shown in the box plot exceeding the standard deviation (all above the median), matching our previous findings as well.
+
+Old Kids Summary
+```{r}
+stat.desc(SwissLabor$oldkids)
+summary(SwissLabor$oldkids)
+```
+
+Histogram of Old Kids with Density Plot
+```{r}
+hist(SwissLabor$oldkids, col = "sandybrown", breaks = 10, 
+     xlab = "Old Kids (number of kids older than 7)", 
+     main = "Histogram of Old Kids", prob = TRUE, xlim = c(0, 25))
+lines(density(SwissLabor$oldkids), lwd = 2, col = "red")
+lines(density(SwissLabor$oldkids, adjust = .5), lwd = 2, col = "blue", 
+      type = 'l', lty = 2)
+rug(SwissLabor$oldkids)
+```
+
+The histogram of the Old Kids (number of kids individuals have that are older than 7), indicates that the distribution is extremely right-skewed. Therefore, we would be looking to use the median as opposed to the mean to measure the central tendency of the data. There is a shorter range of values, spanning from 0 to 6. The density plot illustrates a smooth estimate with many of peaks and valleys of the probability density function of the data. The blue dotted line is a more precise depiction of the data estimatse. It provides a clearer view of the distribution's shape, allowing you to see the many peaks and valleys.
+
+Boxplot of Old Kids
+```{r}
+boxplot(SwissLabor$oldkids, ylab = "Old Kids", 
+        main = "Boxplot of Old Kids", col = "sandybrown")
+```
+
+From the boxplot of Old Kids (the number of kids an individual has that are older than 7), we are able to solidify a few key insights about the data that we learned about through prior tools and figures. We are able to see that the median of the data lies between 0 and 2, which agrees with the true median of 1. We are also able to see that the standard deviation of about 1.08. Additionally, the upper whisker is much longer, suggesting that the data has a right skew with more high values or outliers above the median. The appropriate values of Q1 and Q3 are also displayed, at 0 and 2. In addition, the box plot illustrates the min and max of the data, showing a difference of 6 between the two. There are a few outliers shown in the box plot exceeding the standard deviation (above the median), matching our previous findings as well. 
+
+Foreign Percentages
+```{r}
+table(SwissLabor$foreign)
+prop.table(table(SwissLabor$foreign)) * 100
+```
+
+The binary varialbe foreign indicates whether an individual is a foreigner ("yes) or not ("no") in the SwissLabor dataset. From the summary table, we see that about 75.23% of individuals are not foreigners, while 24.8% are foreigners. This shows that majority of the sample consists of non-foreigners, while about a quarter of the sample are foreigners. 
+
+Correlation Matrix
+```{r}
+# excludes catagorical/binary variables participation and foreign
+numeric_data <- SwissLabor[, c("income", "age", "education", 
+                               "youngkids", "oldkids")]
+cor_matrix <- cor(numeric_data, use = "complete.obs")
+cor_matrix
+```
+
+The correlation matrix displays the pairwise relationships betweeen several key continuous predictors in the dataset, including income (log of non-labor income), age (in decades), education (years of schooling), youngkids (number of kids less than 7), and oldkids (number of kids greater than 7). The participation and foreigner variable are not included due to their binary nature. A correlation close to 1 indicates a strong positive relationship, while a correlation close to -1 reflects a strong negative relationship. A correlation near 0 suggests no relationship. There appears to be a moderate positive correlation between education and income, indicating that individuals with higher education tend to have higher non-labor income. In contrast, there appears to be a moderately strong negative correlation between youngkids and age, indicating that younger individuals tend to have more young children. Additionally, there is a somewhat moderate negative correlation between youngkids and oldkids, suggesting that individuals with more children less than 7 tend to not have as many children greater than 7. Other correlations appear to be rather weak or negligible, suggesting low multicollinearity risks amongst predictors. Overall, the matrix helps identify which variables are more closely associated with one another, and informs further analysis and model building.
+
+## c. 
+
+Fit the three models below, and identify which model is your preferred one.
+
+```{r}
+# LPM 
+# convert participation into a binary variable
+SwissLabor$part_num <- ifelse(SwissLabor$participation == "yes", 1, 0)
+# fit LPM 
+swiss.lpm <- lm(part_num ~ income + age + education + youngkids 
+                + oldkids + foreign, data = SwissLabor)
+
+# Probit
+swiss.probit <- glm(participation ~ income + age + education + 
+                      youngkids + oldkids + foreign, 
+                    data = SwissLabor, family = binomial(link = "probit"))
+
+# Logit
+swiss.logit <- glm(participation ~ income + age + education + youngkids + 
+                     oldkids + foreign, 
+                   data = SwissLabor, family = binomial(link = "logit"))
+```
+```{r}
+# Compare the Models - AIC Tests
+AIC(swiss.lpm)
+AIC(swiss.probit)
+AIC(swiss.logit)
+# probit and logit are preferred with very similar results according to AIC tests
+```
+
+```{r}
+# Compare the Models (probit and logit) - McFadden's R^2 (from scratch)
+
+# probit McFadden
+swiss.null_p <- glm(participation ~ 1, data = SwissLabor, 
+                    family = binomial(link = "probit"))
+logLik.full_p <- logLik(swiss.probit)
+logLik.null_p <- logLik(swiss.null_p)
+
+McFadden.R2_p <- 1 - (as.numeric(logLik.full_p) / as.numeric(logLik.null_p))
+
+McFadden.R2_p
+
+# logit McFadden
+swiss.null_l <- glm(participation ~ 1, data = SwissLabor, 
+                    family = binomial(link = "logit"))
+logLik.full_l <- logLik(swiss.logit)
+logLik.null_l <- logLik(swiss.null_l)
+
+McFadden.R2_l <- 1 - (as.numeric(logLik.full_l) / as.numeric(logLik.null_l))
+
+McFadden.R2_l
+```
+
+```{r}
+# Confusion Matrix - Split Data
+library(caret)
+set.seed(123)
+SwissLabor$part_num <- ifelse(SwissLabor$participation == "yes", 1, 0)
+SwissLabor$foreign_num <- ifelse(SwissLabor$foreign == "yes", 1, 0)
+# Split into 70% train, 30% test
+train_index <- sample(c(TRUE, FALSE), nrow(SwissLabor), 
+                      replace = TRUE, prob = c(0.7, 0.3))
+# Create datasets
+train <- SwissLabor[train_index, ]
+test <- SwissLabor[!train_index, ]
+
+# LPM - Confusion Matrix
+set.seed(123)
+lpm_model <- lm(part_num ~ income + age + education + 
+                  youngkids + oldkids + foreign_num, data = train)
+pred_lpm <- predict(lpm_model, newdata = test)
+class_lpm <- ifelse(pred_lpm >= 0.5, 1, 0)
+confusionMatrix(as.factor(class_lpm), as.factor(test$part_num), positive = "1")
+
+# Probit - Confusion Matrix
+probit_model <- glm(part_num ~ income + age + education + youngkids + 
+                      oldkids + foreign_num, data = train, 
+                    family = binomial(link = "probit"))
+pred_probit <- predict(probit_model, newdata = test, type = "response")
+class_probit <- ifelse(pred_probit >= 0.5, 1, 0)
+confusionMatrix(as.factor(class_probit), as.factor(test$part_num), positive = "1")
+
+# Logit - Confusion Matrix
+logit_model <- glm(part_num ~ income + age + education + youngkids + 
+                     oldkids + foreign_num, data = train, 
+                   family = binomial(link = "logit"))
+pred_logit <- predict(logit_model, newdata = test, type = "response")
+class_logit <- ifelse(pred_logit >= 0.5, 1, 0)
+confusionMatrix(as.factor(class_logit), as.factor(test$part_num), positive = "1")
+```
+
+Based on the model selection criteria, the logit model is preferred. Both the probit and logit models yield similarly low AIC values, indicating comparable model fit, with the logit model showing a very slightly lower AIC. Additionally, the McFadden's pseudo R² for the logit model is slightly higher than that of the probit model, reinforcing the choice of the logit model as the preferred specification. [If we include the confusion matrix: From the confusion matrix, accuracy of the linear probability model, the probit, and logit models, all yield very similar results, however the logit model is ever so slightly higher.] While the differences between the two models are rather minor, the logit model consistently performs slightly better on both metrics.
+
+```{r}
+# average marginal effects 
+library(margins)
+margins(swiss.logit)
+```
+
+Interpretations of Average Marginal Effects:
+  Income: There is an decrease in the probability of participating in the Swiss labor force, by about 17 percentage points, as the log of income-labor income increases. 
+  Age: There is a decrease in the probability of participation in the Swiss labor force by about 10.6 percentage points, as for each additional increase in decades.
+  Education: there is a slight increase in the probability of participating in the Swiss labor force, by about 0.66 percentage points, for increases in years of education. 
+  Youngkids: There is a decrease in probability of participating in the Swiss labor force, by about 27.7 percentage points, for each additional young child.
+  Oldkids: There is an extremely slight decrease, essentially negligiible, in the probability of participation in the Swiss labor force for each additional older child.
+  Foreign: There is an increase in the probability of participating in the Swiss labor force, by about 28.3 percentage points, from people who aren't foreigners to those who are. 
+  
+Based on the logit model selected as the final model, we computed the Average Marginal Effects (AMEs). The results indicate that higher non-labor income, older age, and more young children significantly reduce the probability of labor force participation, while being a foreigner substantially increases it by approximately 28.3 percentage points. Education exerts a small positive effect, increasing participation likelihood marginally per additional year of schooling. The number of older children has little meaningful impact on participation. Overall, the logit model effectively indentifies the key socioeconomic and demographic factors that influence labor force participation in Switzerland, confirming our hypothesis that variables such as income, age, education, and family responsibilities may play crucial roles. 

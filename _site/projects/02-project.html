@@ -6,8 +6,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Prisha Narasimhan">
+<meta name="dcterms.date" content="2025-10-15">
+<meta name="description" content="  This project analyzes the AirPassengers dataset, exploring additive and multiplicative decompositions to understand trends, seasonality, and residual structures. I compared decomposition methods, evaluate autocorrelation, and select models for forecasting a year ahead, including a log-transformed trend + seasonal model and ETS. The analysis provides insights into international airline passenger growth and seasonal travel patterns. ">
 
-<title>Project 2 – personal website</title>
+<title>Economics 144 - AirPassengers – personal website</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -146,22 +149,54 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#trend-and-seasonal-adjustments" id="toc-trend-and-seasonal-adjustments" class="nav-link active" data-scroll-target="#trend-and-seasonal-adjustments">Trend and Seasonal Adjustments</a>
+  <ul class="collapse">
+  <li><a href="#a" id="toc-a" class="nav-link" data-scroll-target="#a">(a)</a></li>
+  <li><a href="#b" id="toc-b" class="nav-link" data-scroll-target="#b">(b)</a></li>
+  <li><a href="#c" id="toc-c" class="nav-link" data-scroll-target="#c">(c)</a></li>
+  <li><a href="#d" id="toc-d" class="nav-link" data-scroll-target="#d">(d)</a></li>
+  <li><a href="#e" id="toc-e" class="nav-link" data-scroll-target="#e">(e)</a></li>
+  <li><a href="#f" id="toc-f" class="nav-link" data-scroll-target="#f">(f)</a></li>
+  </ul></li>
+  <li><a href="#conclusions-and-future-work" id="toc-conclusions-and-future-work" class="nav-link" data-scroll-target="#conclusions-and-future-work">Conclusions and Future Work</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Project 2</h1>
+<h1 class="title">Economics 144 - AirPassengers</h1>
 </div>
 
+<div>
+  <div class="description">
+    <p><br> This project analyzes the AirPassengers dataset, exploring additive and multiplicative decompositions to understand trends, seasonality, and residual structures. I compared decomposition methods, evaluate autocorrelation, and select models for forecasting a year ahead, including a log-transformed trend + seasonal model and ETS. The analysis provides insights into international airline passenger growth and seasonal travel patterns.<br></p>
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Prisha Narasimhan </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 15, 2025</p>
+    </div>
+  </div>
   
     
   </div>
@@ -171,19 +206,252 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>some complicated stats project</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rnorm</span>(<span class="dv">100</span>) <span class="sc">|&gt;</span> <span class="fu">hist</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load data</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>AirPassengers <span class="ot">&lt;-</span> AirPassengers</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="trend-and-seasonal-adjustments" class="level1">
+<h1>Trend and Seasonal Adjustments</h1>
+<section id="a" class="level2">
+<h2 class="anchored" data-anchor-id="a">(a)</h2>
+<p>Perform an additive decomposition of your series. Remove the trend and seasonality, and comment on the ACF and PACF of the residuals (i.e., what is left after detrending and seasonally adjusting the series). Comment on the results.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># additive decomposition of the series</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>dcmp_add_ap <span class="ot">&lt;-</span> <span class="fu">decompose</span>(<span class="fu">ts</span>(AirPassengers, <span class="at">start =</span> <span class="fu">c</span>(<span class="dv">1949</span>, <span class="dv">1</span>), <span class="at">freq =</span> <span class="dv">12</span>), </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"additive"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(dcmp_add_ap, <span class="at">xlab =</span> <span class="st">"Year"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="02-project_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="02-project_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>passengers <span class="ot">&lt;-</span> <span class="fu">ts</span>(AirPassengers, <span class="at">start =</span> <span class="fu">c</span>(<span class="dv">1949</span>, <span class="dv">1</span>), <span class="at">frequency =</span> <span class="dv">12</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># remove the trend and seasonality</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># trend component</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>ap_trend <span class="ot">&lt;-</span> dcmp_add_ap<span class="sc">$</span>trend</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># seasonal component</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>ap_seasonal <span class="ot">&lt;-</span> dcmp_add_ap<span class="sc">$</span>seasonal</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Detrend and Seasonally Adjust: Y - T - S</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>detrend_seas_adj_ap <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(passengers <span class="sc">-</span> ap_trend <span class="sc">-</span> ap_seasonal)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># ACF and PACF plot</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">tsdisplay</span>(detrend_seas_adj_ap, <span class="at">main =</span> <span class="st">"ACF and PACF of Detrended &amp; Seasonally </span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="st">          Adjusted AirPassengers"</span>, <span class="at">xlab =</span> <span class="st">"Year"</span>, </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>          <span class="at">ylab =</span> <span class="st">"Residuals (Passengers)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>The additive decomposition of the series is ideal when seasonal fluctuations remain relatively constant over time. However, after detrending and seasonally adjusting the AirPassengers data, the ACF and PACF plots reveal significant autocorrelation, indicating that the additive decomposition did not fully remove underlying patterns. Autocorrelation is evident in both ACF and PACF plots, as several residuals extend beyond the 95% confidence bounds. In particular, the PACF shows a strong spike at lag 1, suggesting a lack of stationarity and the persistence of trend or seasonal effects. The large autocorrelations observed in the ACF plot further imply dependence in the number of international airline passengers over time. Overall, these results suggest that a multiplicative decomposition or a transformation may provide a better representation of the data’s structure.</p>
+</section>
+<section id="b" class="level2">
+<h2 class="anchored" data-anchor-id="b">(b)</h2>
+<p>Perform a multiplicative decomposition of your series. Remove the trend and seasonality, and comment on the ACF and PACF of the residuals (i.e., what is left after detrending and seasonally adjusting the series). Comment on the results.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dcmp_mult_ap <span class="ot">&lt;-</span> <span class="fu">decompose</span>(<span class="fu">ts</span>(AirPassengers, <span class="at">start =</span> <span class="fu">c</span>(<span class="dv">1949</span>, <span class="dv">1</span>), <span class="at">freq =</span> <span class="dv">12</span>), </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                          <span class="st">"multiplicative"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(dcmp_mult_ap, <span class="at">xlab =</span> <span class="st">"Year"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remove the trend and seasonality</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># trend component</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>ap_mult_trend <span class="ot">&lt;-</span> dcmp_mult_ap<span class="sc">$</span>trend</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># seasonal component</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ap_mult_seasonal <span class="ot">&lt;-</span> dcmp_mult_ap<span class="sc">$</span>seasonal</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Detrend and Seasonally Adjust: Y / T / S</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>detrend_seas_adj_mult_ap <span class="ot">&lt;-</span> <span class="fu">na.omit</span>((passengers <span class="sc">/</span> ap_mult_trend) <span class="sc">/</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                                      ap_mult_seasonal)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">tsdisplay</span>(detrend_seas_adj_mult_ap, <span class="at">main =</span> <span class="st">"ACF and PACF of Detrended &amp; </span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="st">          Seasonally Adjusted AirPassengers"</span>, <span class="at">xlab =</span> <span class="st">"Year"</span>, </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">ylab =</span> <span class="st">"Residuals (Passengers)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The multiplicative decomposition of the series is most ideal when seasonal fluctuations vary in magnitude over time. After detrending and seasonally adjusting the AirPassengers data, the ACF and PACF plots reveal some remaining autocorrelation; however, the multiplicative decomposition aligns more closely with the underlying structure of the data than the additive model. Autocorrelation is still evident in both plots, as several residuals extend beyond the 95% confidence bounds. In particular, the PACF plot shows a larger spike at lag 1, suggesting a lack of stationarity and the persistence of trend or seasonal effects. The large autocorrelations observed in the ACF plot further indicate some dependence in the number of international airline passengers over time. Overall, while the multiplicative decomposition provides a better fit to the data’s structure than the additive approach, some systematic patterns remain in the residuals.</p>
+</section>
+<section id="c" class="level2">
+<h2 class="anchored" data-anchor-id="c">(c)</h2>
+<p>Which decomposition is better, additive or multiplicative? Why?</p>
+<p>The multiplicative decomposition provides a substantially better fit to the data than the additive decomposition. In the PACF plot of the multiplicative model, only a few larger spikes extend beyond the 95% confidence bounds, whereas the additive decomposition shows more frequent and pronounced lags. Furthermore, in the ACF plots, the autocorrelations from the multiplicative decomposition decay more rapidly than those from the additive model. Although some underlying patterns persist in the residuals of the multiplicative model, the overall dependence on the number of international airline passengers over time is weaker compared to the additive decomposition, indicating a better adjustment to the data’s structure.</p>
+</section>
+<section id="d" class="level2">
+<h2 class="anchored" data-anchor-id="d">(d)</h2>
+<p>Based on the two decompositions, and interpretation of the random components, would your models for the cycles be similar (additive vs.&nbsp;multiplicative) or very different? Why?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Additive Decomposition - Random Component</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ap_random <span class="ot">&lt;-</span> dcmp_add_ap<span class="sc">$</span>random</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ap_random, <span class="at">xlab =</span> <span class="st">"Year"</span>, <span class="at">ylab =</span> <span class="st">"Residuals (Passengers)"</span>, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Additive Decomposition: Random Component"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Multiplicative Decomposition - Random Component</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ap_mult_random <span class="ot">&lt;-</span> dcmp_mult_ap<span class="sc">$</span>random</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(ap_mult_random, <span class="at">xlab =</span> <span class="st">"Year"</span>, <span class="at">ylab =</span> <span class="st">"Residuals"</span>, </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Multiplicative Decomposition: Random Component"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Based on the decomposition and the random components, the cycles in the additive and multiplicative models would be rather different. In the additive decomposition, the random component shows residuals that are larger at the beginning and end of the series but narrower in the middle, indicating non-constant variance over time. This pattern suggests that the additive model does not adequately account for the changing amplitude of the cyclical fluctuations as the number of passengers increases. In contrast, the multiplicative model produces residuals that are more evenly scattered over the years, appearing closer to random noise. This reflects that cyclical movements in passenger counts grow proportionally with the trend. Additionally, the multiplicative decomposition more accurately represents the cyclical structure of the AirPassengers data, where both the trend and the magnitude of seasonal and cyclical varianations increase over time.</p>
+</section>
+<section id="e" class="level2">
+<h2 class="anchored" data-anchor-id="e">(e)</h2>
+<p>Plot the seasonal factors and comment on the plot.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># multiplicative, therefore, use log-transformation to stablize variance</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>lpassengers <span class="ot">&lt;-</span> <span class="fu">log</span>(passengers)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the linear models</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">tslm</span>(lpassengers <span class="sc">~</span> trend)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">tslm</span>(lpassengers <span class="sc">~</span> season)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">tslm</span>(lpassengers <span class="sc">~</span> trend <span class="sc">+</span> season)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the fitted models </span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lpassengers, <span class="at">main =</span> <span class="st">"Model 1: Time Series Data: Trend"</span>, </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Passengers"</span>, <span class="at">xlab =</span> <span class="st">"Year"</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(fit1<span class="sc">$</span>fitted.values, <span class="at">col =</span> <span class="st">"maroon4"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lpassengers, <span class="at">main =</span> <span class="st">"Model 2: Time Series Data: Seasonality"</span>, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Passengers"</span>, <span class="at">xlab =</span> <span class="st">"Year"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(fit2<span class="sc">$</span>fitted.values, <span class="at">col =</span> <span class="st">"maroon3"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lpassengers, <span class="at">main =</span> <span class="st">"Model 3: Time Series Data: Trend + Seasonality"</span>, </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Passengers"</span>, <span class="at">xlab =</span> <span class="st">"Year"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(fit3<span class="sc">$</span>fitted.values, <span class="at">col =</span> <span class="st">"maroon2"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-6-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the models with AIC and BIC tests</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(fit1,fit2,fit3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     df       AIC
+fit1  3 -155.5887
+fit2 13  185.4405
+fit3 14 -390.5952</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BIC</span>(fit1,fit2,fit3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     df       BIC
+fit1  3 -146.6793
+fit2 13  224.0480
+fit3 14 -349.0178</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the seasonal factors</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">tslm</span>(lpassengers <span class="sc">~</span> season <span class="sc">+</span> <span class="dv">0</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit<span class="sc">$</span>coef, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">ylab =</span> <span class="st">"Seasonal Factors"</span>, <span class="at">xlab =</span> <span class="st">"Month"</span>, </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Seasonal Factors for Air Passengers"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"dodgerblue2"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-6-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To preface, we had taken the log-transformation of the passengers due to the multiplicative nature of the time series, in an attempt to stabilize the variance. The seasonal factor plot for the AirPassengers data show clear within-year patterns. Passenger numbers are lowest in the early months (January-February), rise steadily through the spring, and peak during the summer months (July-August), with a smaller increase in December. This is consistent with seasonal travel behavior as people tend travel more due to factors such as warmer weather, school breaks and holidays, and the holiday season. The fitted models indicate that including both trend and seasonality provides the best representation to the data, as confirmed by the results of the AIC and BIC tests (having the lowest values for the trend + seasonality model).</p>
+</section>
+<section id="f" class="level2">
+<h2 class="anchored" data-anchor-id="f">(f)</h2>
+<p>Based on your analysis thus far, choose a model that includes your preferred trend and seasonal model to forecast 12-steps ahead, and show the plot of the data, respective fit, and forecast.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the data is multiplicative (variance grows with the trend)</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># log-transformed trend and seasonality model </span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>lpassengers <span class="ot">&lt;-</span> <span class="fu">log</span>(passengers)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the preferred linear trend </span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>fit_pref <span class="ot">&lt;-</span> <span class="fu">tslm</span>(lpassengers <span class="sc">~</span> trend <span class="sc">+</span> season)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">forecast</span>(fit_pref, <span class="at">h =</span> <span class="dv">12</span>), <span class="at">main =</span> <span class="st">"Forecast - Trend + Seasonality"</span>, </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Year"</span>, <span class="at">ylab =</span> <span class="st">"log(Passengers)"</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(fit_pref<span class="sc">$</span>fitted.values, <span class="at">col =</span> <span class="st">"maroon1"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Observed Data"</span>, <span class="st">"Model Fit"</span>, <span class="st">"Forecast"</span>), </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"maroon1"</span>, <span class="st">"blue"</span>), <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">3</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># improve the forecast using ets</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>fit_ets <span class="ot">&lt;-</span> <span class="fu">ets</span>(passengers)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit_ets)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-7-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">accuracy</span>(fit_ets)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   ME     RMSE      MAE       MPE     MAPE      MASE       ACF1
+Training set 1.567359 10.74726 7.791605 0.4357799 2.857917 0.2432573 0.03945056</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">forecast</span>(fit_ets, <span class="at">level =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">80</span>, <span class="dv">95</span>), <span class="at">h =</span> <span class="dv">12</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="02-project_files/figure-html/unnamed-chunk-7-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Based on the analysis thus far, the preferred model for forecasting the AirPassengers data is the log-transformed linear trend + seasonal model, which accounts for the multiplicative nature of the data. The logarithmic transformation stabilizes the variance and converts the multiplicative relationship between trend and seasonality into an additive one, making the model more suitable for linear regression analysis. The model captures the observed time series well and our forecast for the next 12 months, illustrated with a continued upwards trend alongside recurring seasonal peaks. To improve the accuracy of the forecast, an ETS model was also fitted to the original data. The ETS forecast produces similar results to the regression model but automatically adjusts for changing seasonal amplitudes, providing a more flexible and robust forecast of future passenger numbers on international airlines.</p>
+</section>
+</section>
+<section id="conclusions-and-future-work" class="level1">
+<h1>Conclusions and Future Work</h1>
+<p>From our analysis, the log-transformed trend and seasonal model was our preferred choice to represent and forecast the AirPassengers dataset. The model captures the upward growth in air travel and the repeating seasonal factors, while the log transformation stabilizes the variance and recognizes the multiplicative nature of the series through a linear framework. The residual diagnostics (the AFC/PACF plots) and the decomposition comparisons suggest that this model best accounts for and removes autocorrelation; however, we had observed that some underlying patterns remained. When forecasting 12 months ahead, the model projected a continued upward trend in passenger numbers for international airlines with recurring seasonal peaks.</p>
+<p>We may further improve our model by incorporating exogenous variables such as airline capacity, airport infrastructure, and expansion, or consider factors such as population growth. We may additionally investigate non-linear models to better understand the more complex dynamics, as autocorrelations remain. Finally, while the ETS model has already been considered, it may offer a more flexible structure for modeling changing seasonal amplitudes and evolving trend structures over time.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
