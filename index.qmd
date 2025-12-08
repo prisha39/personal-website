@@ -17,8 +17,9 @@ about:
       url: "resume.pdf"
 toc: FALSE
 ---
+## Bio
 
-Finley Malloc is the Chief Data Scientist at Wengo Analytics. When not innovating on data platforms, Finley enjoys spending time unicycling and playing with her pet iguana.
+My name is Prisha Narasimhan, and I'm an economics and data science student passionate about using data and statistical modeling to create meaningful community impact. I have experience supporting large-scale technology modernization, cross-functional coordination, and data-driven decision-making across consulting, government, and technology environments. Looking ahead, I hope to bring quantitative analysis to public policy and international relations, translating data-driven insights into strategies that create positive social impact.
 
 ## Education
 
