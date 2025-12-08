@@ -4,7 +4,7 @@ project:
     - resume.pdf
 
 website:
-  title: "personal website"
+  title: "Prisha Narasimhan"
   search: false
   navbar:
     right:
